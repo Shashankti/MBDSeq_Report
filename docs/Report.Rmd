@@ -1,0 +1,434 @@
+---
+title: "Analysis of MBD/MeDip-Seq data"
+author: "Shashank Tiwari"
+date: "Most recent update:<br> `r Sys.Date()`"
+output: 
+  rmarkdown::html_document: 
+    theme: spacelab
+    highlight: zenburn 
+    code_folding: show 
+    toc: true 
+    toc_float: true
+    smooth_scroll: true
+    number_sections: false 
+    self_contained: true 
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=T, message=F}
+#root.dir <- here::here()
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  #root.dir = root.dir
+  fig.height = 6,
+  fig.width = 7.00787 #178mm
+)  
+knitr::opts_knit$set(#root.dir = root.dir, 
+                     dpi = 350)  
+library(data.table)
+library(ggplot2)
+library(cowplot)
+library(MEDIPS)
+library(DiffBind)
+library(BSgenome)
+library(Rsamtools)
+library(edgeR)
+library(gtools)
+library(DNAcopy)
+library(rtracklayer)
+library(viridis)
+library(dplyr)
+library(genomation)
+library(biomaRt)
+library(GenomicRanges)
+#library(ggpubr)
+```
+
+## Cleaning and Preprocessing
+
+The raw fastq files provided were first cleaned up using `trimgalore` to remove 
+the adapters and low quality reads(`phredscore cutoff 20`) using the default parameters.
+Next the reads were aligned to `GRCm38` using `bowtie`  on default settings.
+
+The generated `sam` files were deduplicated and sorted before they were used for 
+peak calling by `macs2`. We ran `macs2` with settings `--nomodel`and 
+`--extsize 300` as suggested [here](https://manpages.ubuntu.com/manpages/impish/man1/macs2_callpeak.1.html)
+
+The summary of peaks is as follows:
+
+```{r}
+df <- data.frame(c(11872,19814,15099,109375,80700,82972)
+                 ,c("MethylRep1","MethylRep2","MethylRep3","TAYNRep1","TAYNRep2","TAYNRep3"))
+colnames(df) <- c("No. of Peaks","Replicates")
+DT::datatable(df, caption = "Peaks summay")
+```
+
+
+```{r}
+df <- data.frame(c(244383927,303939487,266572321,357108714,284773719,277920034,297967032,257499466),c("MethylRep1","MethylRep2","MethylRep3","TAYNRep1","TAYNRep2","TAYNRep3","TAYN-Input","WT-Input"))
+colnames(df) <- c("Number of reads","Replicate")
+DT::datatable(df,caption = "Summary of read counts")
+```
+
+## Differential binding regions
+After the peak calling we are interested in finding the regions which show a 
+differential binding pattern. We decided to use the MEDIPS package. 
+MEDIPS was developed for analyzing data derived from methylated DNA 
+immunoprecipitation (MeDIP) experiments followed by sequencing (MeDIP-seq).
+However, MEDIPS provides several functionalities for the analysis of
+other kinds of quantitative sequencing data such as ChIPSeq, MBDSeq etc,i
+ncluding calculation of differential coverage between groups of samples 
+as well as saturation and correlation analyses.
+
+In detail, MEDIPS adresses the following:
+- estimating the reproducibility for obtaining full genome short read coverage profiles
+- calculating genome wide signal densities at a user specified resolution
+- calculating differential coverage comparing two groups of samples,
+- correcting for copy number variations present in the genomic background samples 
+
+In addition, MEDIPS provides the following MeDIP/MBD-seq specific functionalities:
+- analyzing the coverage of genome wide DNA sequence patterns (e.g. CpGs)
+- calculating a CpG enrichment factor as a quality control for MeDIP/MBD
+  specific immunoprecipitation,
+- plotting of calibration plots as a data quality check and for a visual 
+  inspection of the dependency between local sequence pattern (e.g. CpG)
+  densities and MeDIP/MBD signals,
+- normalization of MeDIP-seq data with respect to local sequence pattern
+  (e.g. CpG) densities (relative methylation score),
+
+### Running MEDIPS
+
+MEDIPS takes the input of bam files and provides methods for quality control.
+- *Saturation analysis* is used to identify given set of mapped reads is sufficient
+  to generate a saturated and reproducible coverage profile of the reference genome,
+- Gives the output of estimated and trye correlation analysis. The main idea is that 
+  an insufficent number of short reads will not result in a saturated methylation profile.
+  Only if there is a sufficient number of short reads, the resulting genome wide coverage
+  profile will be reproducible by another independent set of a similar number of short reads.
+- *Sequence Pattern Coverage* used to test the number of CpGs covered by the given short
+  read and the read depth coverage per CpG.
+  
+- *CpG Enrichment* 
+
+
+```{r,eval=FALSE}
+
+rep1.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/Methyl-Cap-1_fixed_sorted.bam"
+rep2.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/Methyl-Cap-1_fixed_sorted.bam"
+rep3.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/Methyl-Cap-3_fixed_sorted.bam"
+input.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/wt-input_fixed_sorted.bam"
+#read in the mutant bams
+mutant1.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-Cap-1_fixed_sorted.bam"
+mutant2.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-Cap-2_fixed_sorted.bam"
+mutant3.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-Cap-3_fixed_sorted.bam"
+mutant.input <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-input_fixed_sorted.bam"
+
+
+#specify parameters
+BSgenome = "BSgenome.Mmusculus.GRCm38"
+uniq=TRUE
+extend=300
+shift=0
+ws=150
+chr.select=c(1:19,"X","Y","MT")
+
+#saturation analysis
+sr = MEDIPS.saturation(file = c(rep1.bam,rep2.bam,input.bam),BSgenome = BSgenome,
+                       uniq = 0,extend = 300,
+                       shift = 0, window_size = ws,
+                        nit=10,nrit = 1,empty_bins = T,
+                       rank = F)
+#saturation plot
+MEDIPS.plotSaturation(sr)
+```
+
+
+#### Summary of saturation analysis:
+
+
+
+The saturation plots for wildtype data,
+
+
+
+
+
+And for TAYN Mutant bam files,
+
+
+
+We next plot the correlation heatmap using MEDIPS
+
+
+
+Further the next step is to perform sequenec pattern coverage analysis to determine
+the number of CpGs and the depth of coverage per CpG.
+
+
+```{r,eval=FALSE}
+# pattern coverange 
+cr = MEDIPS.seqCoverage(file = mutant1.bam, pattern = "CG",
+                        BSgenome = BSgenome, chr.select = 10,
+                        extend = extend, shift = shift, uniq = 0)
+
+MEDIPS.plotSeqCoverage(seqCoverageObj = cr, type="pie",cov.level = c(30:45))
+
+MEDIPS.plotSeqCoverage(seqCoverageObj = cr, type = "hist", t =45,
+                       main = "Sequnce pattern Coverage")
+```
+
+
+
+The CpG enrichment checking is done in MEDIPS by testing the enrichment of CpGs within
+the genomic regions covered by a given set of short reads compared to the full reference
+genome. The final score is given by dividing the relative frequency of CpGs of the
+regions by the relative frequency of CpGs of the reference genome.
+
+
+
+```{r,eval=FALSE}
+er = MEDIPS.CpGenrich(file = rep1.bam, BSgenome = BSgenome, chr.select = 1,
+                      extend = extend, shift = shift, uniq = 0)
+
+
+
+```
+
+
+#### Summary of CpG enrichment
+
+Lastly we run MEDIPS do find the differentially methylated regions,
+
+
+
+```{r,eval=FALSE}
+# make MEDIPset for replicates and input
+
+Methyl_rep1 = MEDIPS.createSet(file = rep1.bam, BSgenome = BSgenome,
+                               extend = extend, shift = shift, uniq = 0,
+                               window_size = ws, chr.select = chr.select)
+
+Methyl_rep1 =c(Methyl_rep1,MEDIPS.createSet(file = rep2.bam, BSgenome = BSgenome,
+                               extend = extend, shift = shift, uniq = 0,
+                               window_size = ws, chr.select = chr.select))
+
+Methyl_rep1 =c(Methyl_rep1,MEDIPS.createSet(file = rep3.bam, BSgenome = BSgenome,
+                               extend = extend, shift = shift, uniq = 0,
+                               window_size = ws, chr.select = chr.select))
+
+Input_methyl = MEDIPS.createSet(file= input.bam, BSgenome=BSgenome,
+                                extend = extend, shift = shift, uniq = 0,
+                                window_size = ws, chr.select=chr.select)
+
+# make MEDIPSet for Mutant type and input
+
+Mutant_rep1 = MEDIPS.createSet(file=mutant1.bam, BSgenome = BSgenome,
+                               extend = extend, shift = shift, uniq = 0,
+                               window_size = ws, chr.select = chr.select)
+Mutant_rep1 = c(Mutant_rep1, MEDIPS.createSet(file=mutant2.bam, BSgenome = BSgenome,
+                               extend = extend, shift = shift, uniq = 0,
+                               window_size = ws, chr.select = chr.select))
+Mutant_rep1 = c(Mutant_rep1, MEDIPS.createSet(file=mutant3.bam, BSgenome = BSgenome,
+                               extend = extend, shift = shift, uniq = 0,
+                               window_size = ws, chr.select = chr.select))
+Input_Mutant = MEDIPS.createSet(file=mutant.input, BSgenome = BSgenome,
+                               extend = extend, shift = shift, uniq = 0,
+                               window_size = ws, chr.select = chr.select)
+#generate a coupling set
+CS = MEDIPS.couplingVector(pattern = "CG", refObj = Mutant_rep1[[1]])
+
+
+# coverage and edgeR analysis
+
+mr.edgeR = MEDIPS.meth(MSet1 = Methyl_rep1, MSet2 = Mutant_rep1,
+                       CSet = CS, ISet1 = Input_methyl, ISet2 = Input_Mutant, p.adj = "bonferroni",
+                       diff.method = "edgeR", MeDIP = T,
+                       CNV = T, minRowSum = 1)
+
+#find significant regions
+mr.edgeR.s = MEDIPS.selectSig(results = mr.edgeR, p.value = 0.1,
+                              adj = T, ratio = NULL, bg.counts = NULL, CNV = F)
+# merge neighbors
+
+mr.edgeR.s.gain = mr.edgeR.s[which(mr.edgeR.s[,grep("logFC",colnames(mr.edgeR.s))] <0),]
+mr.edgeR.s.gain.m = MEDIPS.mergeFrames(frames = mr.edgeR.s.gain, distance = 0)
+# regions of interest
+
+rois = MEDIPS.selectROIs(results = mr.edgeR,rois = mr.edgeR.s.gain.m,
+                         columns = "counts", summarize = NULL)
+
+#calibration plot
+#MEDIPS.plotCalibrationPlot(CSet = CS, main = "CalibrationPlot",
+#                           MSet = Mutant_rep1[[2]], plot_chr = "1", xrange = T)
+
+#correlation of medips set
+cor.matrix = MEDIPS.correlation(MSets = c(Methyl_rep1, Mutant_rep1, Input_methyl, Input_Mutant))
+```
+
+
+## Deeptools
+
+deepTools is a suite of python tools particularly developed for the efficient analysis 
+of high-throughput sequencing data, such as ChIP-seq, RNA-seq or MNase-seq. We used this 
+tool to calculate coverage and generate profile and heatmap plots
+
+
+
+### BamCoverage
+This tool takes an alignment of reads or fragments as input (BAM file) and generates a 
+coverage track (bigWig or bedGraph) as output. The coverage is calculated as the number of
+reads per bin, where bins are short consecutive counting windows of a defined size. We define 
+a bin size of 10 and normalize using Reads Per Kilobase per Million mapped reads (RPKM). The 
+output is stored as bigwig files which can be found [here]()
+
+These bigwig files are used as the input for `multiBigwigSummary`, which computes the average scores
+for each of the files in every genomic region. The output generated in a compressed numpy array(.npz) 
+which is used to generate Correlation and PCA plots.
+
+First we generate the plots to compare amongst the replicates, the correlation is calculated using 
+`plotCoverage` function with Spearman's method and heatmap and scatter plots are generated.
+
+
+Next we get the PCA plots using the `plotPCA` function. Principal component analysis (PCA) 
+can be used to determine whether samples display greater variability between experimental
+conditions than between replicates of the same treatment. PCA is also useful to identify 
+unexpected patterns, such as those caused by batch effects or outliers. Principal components
+represent the directions along which the variation in the data is maximal, so that the 
+information (e.g., read coverage values) from thousands of regions can be represented by
+just a few dimensions.
+
+
+Further we generate the coverage plot to calculate what percentage of reads
+
+Lastly we use the `plotFingerprint` function to generate the fingerprint plots
+
+
+### PlotProfile
+
+The next step is to generate profile plot, however as a prerequisite we need to 
+generate a matrix which contains scores per genome region and can be used as an 
+input for generating heatmap and profile plot.
+
+The plot contains the scores over the peaks regions for the bigwig file.
+
+
+
+
+
+### Heatmaps
+
+Heatmaps with deeptools, combined and separately. 
+
+
+
+
+
+
+
+## ngsplot
+
+
+Show and plot the results:
+```{r}
+#add significant indicator
+res_non_b2b[,significant:=FALSE]
+res_non_b2b[q.value<0.05,significant:=TRUE]
+res_b2b[,significant:=FALSE]
+res_b2b[q.value<0.05,significant:=TRUE]
+plt_non_b2b_frag <-
+  ggplot(res_non_b2b, 
+       aes(x=significant,y=log(frag.length,base=10),fill=significant)) +
+    geom_violin(trim=FALSE,outlier.shape=NA)+
+    geom_boxplot(width=0.1,outlier.shape=NA)+
+    theme_cowplot()+
+    scale_fill_viridis(discrete=T,alpha=0.5)+
+    theme(legend.position="none")+
+    ylab("Log 10 length")+
+    xlab("Significant Interaction")+
+    ggtitle("Fragment Length Non-bait-to-bait interactions")+
+    theme(plot.title = element_text(size = 10))+
+    #remove outliers
+    coord_cartesian(ylim = quantile(log(res_non_b2b$frag.length,base=10), 
+                                          c(0.1, 0.9)))
+plt_non_b2b_bait <-
+  ggplot(res_non_b2b, 
+       aes(x=significant,y=log(bait.length,base=10),fill=significant)) +
+    geom_violin(trim=FALSE,outlier.shape=NA)+
+    geom_boxplot(width=0.1,outlier.shape=NA)+
+    theme_cowplot()+
+    scale_fill_viridis(discrete=T,alpha=0.5)+
+    theme(legend.position="none")+
+    ylab("Log 10 length")+
+    xlab("Significant Interaction")+
+    ggtitle("Bait Length Non-bait-to-bait interactions")+
+    theme(plot.title = element_text(size = 10))
+    #remove outliers
+    #coord_cartesian(ylim = quantile(log(res_non_b2b$bait.length,base=10), 
+     #                                     c(0.1, 0.9)))
+plt_b2b_frag <-
+  ggplot(res_b2b, 
+       aes(x=significant,y=log(frag.length,base=10),fill=significant)) +
+    geom_violin(trim=FALSE,outlier.shape=NA)+
+    geom_boxplot(width=0.1,outlier.shape=NA)+
+    theme_cowplot()+
+    scale_fill_viridis(discrete=T,alpha=0.5)+
+    theme(legend.position="none")+
+    ylab("Log 10 length")+
+    xlab("Significant Interaction")+
+    ggtitle("Fragment Length Bait-to-bait interactions")+
+    theme(plot.title = element_text(size = 10))
+    #remove outliers
+    #coord_cartesian(ylim = quantile(log(res_b2b$frag.length,base=10), 
+     #                                     c(0.1, 0.9)))
+plt_b2b_bait <-
+  ggplot(res_b2b, 
+       aes(x=significant,y=log(bait.length,base=10),fill=significant)) +
+    geom_violin(trim=FALSE,outlier.shape=NA)+
+    geom_boxplot(width=0.1,outlier.shape=NA)+
+    theme_cowplot()+
+    scale_fill_viridis(discrete=T,alpha=0.5)+
+    theme(legend.position="none")+
+    ylab("Log 10 length")+
+    xlab("Significant Interaction")+
+    ggtitle("Bait Length Bait-to-bait interactions")+
+    theme(plot.title = element_text(size = 10))
+    #remove outliers
+    #coord_cartesian(ylim = quantile(log(res_b2b$bait.length,base=10), 
+    #                                      c(0.1, 0.9)))
+gridExtra::grid.arrange(plt_non_b2b_frag,plt_non_b2b_bait,
+                          plt_b2b_frag,plt_b2b_bait,ncol=2)
+```
+
+## Distance of Interactions from Transcriptional Start Site
+
+To validate the `Chicane` model for use with RADICL-Seq data, we hypothesised that
+there would be a build up of interacitons found close to the Transcriptional 
+Start Site of the RNA in question. Since this is more likely to occur due to 
+random chance, we hoped `Chicane` would take this into account and that the 
+significant interactions would not be all in this region.
+
+**NOTE** - Since this analysis is based on distance, trans interactions which 
+account for `r round(nrow(res[is.na(distance)])/nrow(res)*100,1)`% of all 
+interactions, could not be included.
+
+```{r}
+#split by groups
+ggplot(res_stretch_cis, aes(log(distance,base=10), 
+                                fill = q_bin, colour = q_bin)) +
+    geom_density(alpha = 0.1)+theme_cowplot()+
+    scale_fill_viridis(name="Adj. P-value Bin",discrete=T)+
+    scale_colour_viridis(name="Adj. P-value Bin",discrete=T)+
+    geom_vline(xintercept=log(60000,base=10), colour="grey") +
+    geom_vline(xintercept=log(300000,base=10), colour="grey") +
+    annotate(x=log(60000,base=10),y=2,label="60Kb",vjust=2,geom="label")+
+    annotate(x=log(300000,base=10),y=2,label="300Kb",vjust=2,geom="label")+
+    xlab("Log 10 Distance from Interaction to RNA")
+```
+
+**NOTE** - A significant proportion of all interactions are by MALAT1 and NEAT1
+which can skew the data (discused in coding vs non-coding section). Thus all 
+plots will also be shown excluding interactions from these RNA.
+
+
