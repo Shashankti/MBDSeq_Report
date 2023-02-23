@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Shashank Tiwari" />
+
+
+<title>Analysis of MBD/MeDip-Seq data</title>
+
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/htmlwidgets-1.6.1/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.27/datatables.js"></script>
+<link href="site_libs/dt-core-1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.12.1/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.12.1/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">MBD/MeDip-analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About Data</a>
+</li>
+<li>
+  <a href="compare.html">Comparision of peaks</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Analysis of MBD/MeDip-Seq data</h1>
+<h4 class="author">Shashank Tiwari</h4>
+<h4 class="date">Most recent update:<br> 2023-02-23</h4>
+
+</div>
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#root.dir &lt;- here::here()</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">collapse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">comment =</span> <span class="st">&quot;#&gt;&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#root.dir = root.dir</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.height =</span> <span class="dv">6</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.width =</span> <span class="fl">7.00787</span> <span class="co">#178mm</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)  </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_knit<span class="sc">$</span><span class="fu">set</span>(<span class="co">#root.dir = root.dir, </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">dpi =</span> <span class="dv">350</span>)  </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MEDIPS)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DiffBind)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BSgenome)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Rsamtools)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(edgeR)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtools)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DNAcopy)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rtracklayer)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(genomation)</span></code></pre></div>
+<pre><code>## Warning: replacing previous import &#39;Biostrings::pattern&#39; by &#39;grid::pattern&#39;
+## when loading &#39;genomation&#39;</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biomaRt)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GenomicRanges)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#library(ggpubr)</span></span></code></pre></div>
+<div id="cleaning-and-preprocessing" class="section level2">
+<h2>Cleaning and Preprocessing</h2>
+<p>The raw fastq files provided were first cleaned up using
+<code>trimgalore</code> to remove the adapters and low quality
+reads(<code>phredscore cutoff 20</code>) using the default parameters.
+Next the reads were aligned to <code>GRCm38</code> using
+<code>bowtie</code> on default settings.</p>
+<p>The generated <code>sam</code> files were deduplicated and sorted
+before they were used for peak calling by <code>macs2</code>. We ran
+<code>macs2</code> with settings <code>--nomodel</code>and
+<code>--extsize 300</code> as suggested <a
+href="https://manpages.ubuntu.com/manpages/impish/man1/macs2_callpeak.1.html">here</a></p>
+<p>The summary of peaks is as follows:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">c</span>(<span class="dv">11872</span>,<span class="dv">19814</span>,<span class="dv">15099</span>,<span class="dv">109375</span>,<span class="dv">80700</span>,<span class="dv">82972</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                 ,<span class="fu">c</span>(<span class="st">&quot;MethylRep1&quot;</span>,<span class="st">&quot;MethylRep2&quot;</span>,<span class="st">&quot;MethylRep3&quot;</span>,<span class="st">&quot;TAYNRep1&quot;</span>,<span class="st">&quot;TAYNRep2&quot;</span>,<span class="st">&quot;TAYNRep3&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;No. of Peaks&quot;</span>,<span class="st">&quot;Replicates&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(df, <span class="at">caption =</span> <span class="st">&quot;Peaks summay&quot;</span>)</span></code></pre></div>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-d6cdd5e2433393960c03" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d6cdd5e2433393960c03">{"x":{"filter":"none","vertical":false,"caption":"<caption>Peaks summay<\/caption>","data":[["1","2","3","4","5","6"],[11872,19814,15099,109375,80700,82972],["MethylRep1","MethylRep2","MethylRep3","TAYNRep1","TAYNRep2","TAYNRep3"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>No. of Peaks<\/th>\n      <th>Replicates<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">c</span>(<span class="dv">244383927</span>,<span class="dv">303939487</span>,<span class="dv">266572321</span>,<span class="dv">357108714</span>,<span class="dv">284773719</span>,<span class="dv">277920034</span>,<span class="dv">297967032</span>,<span class="dv">257499466</span>),<span class="fu">c</span>(<span class="st">&quot;MethylRep1&quot;</span>,<span class="st">&quot;MethylRep2&quot;</span>,<span class="st">&quot;MethylRep3&quot;</span>,<span class="st">&quot;TAYNRep1&quot;</span>,<span class="st">&quot;TAYNRep2&quot;</span>,<span class="st">&quot;TAYNRep3&quot;</span>,<span class="st">&quot;TAYN-Input&quot;</span>,<span class="st">&quot;WT-Input&quot;</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Number of reads&quot;</span>,<span class="st">&quot;Replicate&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(df,<span class="at">caption =</span> <span class="st">&quot;Summary of read counts&quot;</span>)</span></code></pre></div>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-8735314a2fed8871e160" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8735314a2fed8871e160">{"x":{"filter":"none","vertical":false,"caption":"<caption>Summary of read counts<\/caption>","data":[["1","2","3","4","5","6","7","8"],[244383927,303939487,266572321,357108714,284773719,277920034,297967032,257499466],["MethylRep1","MethylRep2","MethylRep3","TAYNRep1","TAYNRep2","TAYNRep3","TAYN-Input","WT-Input"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Number of reads<\/th>\n      <th>Replicate<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":1},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="differential-binding-regions" class="section level2">
+<h2>Differential binding regions</h2>
+<p>After the peak calling we are interested in finding the regions which
+show a differential binding pattern. We decided to use the MEDIPS
+package. MEDIPS was developed for analyzing data derived from methylated
+DNA immunoprecipitation (MeDIP) experiments followed by sequencing
+(MeDIP-seq). However, MEDIPS provides several functionalities for the
+analysis of other kinds of quantitative sequencing data such as ChIPSeq,
+MBDSeq etc,i ncluding calculation of differential coverage between
+groups of samples as well as saturation and correlation analyses.</p>
+<p>In detail, MEDIPS adresses the following: - estimating the
+reproducibility for obtaining full genome short read coverage profiles -
+calculating genome wide signal densities at a user specified resolution
+- calculating differential coverage comparing two groups of samples, -
+correcting for copy number variations present in the genomic background
+samples</p>
+<p>In addition, MEDIPS provides the following MeDIP/MBD-seq specific
+functionalities: - analyzing the coverage of genome wide DNA sequence
+patterns (e.g. CpGs) - calculating a CpG enrichment factor as a quality
+control for MeDIP/MBD specific immunoprecipitation, - plotting of
+calibration plots as a data quality check and for a visual inspection of
+the dependency between local sequence pattern (e.g. CpG) densities and
+MeDIP/MBD signals, - normalization of MeDIP-seq data with respect to
+local sequence pattern (e.g. CpG) densities (relative methylation
+score),</p>
+<div id="running-medips" class="section level3">
+<h3>Running MEDIPS</h3>
+<p>MEDIPS takes the input of bam files and provides methods for quality
+control. - <em>Saturation analysis</em> is used to identify given set of
+mapped reads is sufficient to generate a saturated and reproducible
+coverage profile of the reference genome, - Gives the output of
+estimated and trye correlation analysis. The main idea is that an
+insufficent number of short reads will not result in a saturated
+methylation profile. Only if there is a sufficient number of short
+reads, the resulting genome wide coverage profile will be reproducible
+by another independent set of a similar number of short reads. -
+<em>Sequence Pattern Coverage</em> used to test the number of CpGs
+covered by the given short read and the read depth coverage per CpG.</p>
+<ul>
+<li><em>CpG Enrichment</em></li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>rep1.bam <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/Methyl-Cap-1_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>rep2.bam <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/Methyl-Cap-1_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>rep3.bam <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/Methyl-Cap-3_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>input.bam <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/wt-input_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#read in the mutant bams</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>mutant1.bam <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-Cap-1_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>mutant2.bam <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-Cap-2_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>mutant3.bam <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-Cap-3_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>mutant.input <span class="ot">&lt;-</span> <span class="st">&quot;/scratch1/users/shashank.tiwari/MBDSeq/Bam/TAYN-input_fixed_sorted.bam&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#specify parameters</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>BSgenome <span class="ot">=</span> <span class="st">&quot;BSgenome.Mmusculus.GRCm38&quot;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>uniq<span class="ot">=</span><span class="cn">TRUE</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>extend<span class="ot">=</span><span class="dv">300</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>shift<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>ws<span class="ot">=</span><span class="dv">150</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>chr.select<span class="ot">=</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">19</span>,<span class="st">&quot;X&quot;</span>,<span class="st">&quot;Y&quot;</span>,<span class="st">&quot;MT&quot;</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#saturation analysis</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>sr <span class="ot">=</span> <span class="fu">MEDIPS.saturation</span>(<span class="at">file =</span> <span class="fu">c</span>(rep1.bam,rep2.bam,input.bam),<span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>                       <span class="at">uniq =</span> <span class="dv">0</span>,<span class="at">extend =</span> <span class="dv">300</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shift =</span> <span class="dv">0</span>, <span class="at">window_size =</span> ws,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>                        <span class="at">nit=</span><span class="dv">10</span>,<span class="at">nrit =</span> <span class="dv">1</span>,<span class="at">empty_bins =</span> T,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>                       <span class="at">rank =</span> F)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#saturation plot</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="fu">MEDIPS.plotSaturation</span>(sr)</span></code></pre></div>
+<div id="summary-of-saturation-analysis" class="section level4">
+<h4>Summary of saturation analysis:</h4>
+<p>The saturation plots for wildtype data,</p>
+<p>And for TAYN Mutant bam files,</p>
+<p>We next plot the correlation heatmap using MEDIPS</p>
+<p>Further the next step is to perform sequenec pattern coverage
+analysis to determine the number of CpGs and the depth of coverage per
+CpG.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pattern coverange </span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cr <span class="ot">=</span> <span class="fu">MEDIPS.seqCoverage</span>(<span class="at">file =</span> mutant1.bam, <span class="at">pattern =</span> <span class="st">&quot;CG&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">BSgenome =</span> BSgenome, <span class="at">chr.select =</span> <span class="dv">10</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">MEDIPS.plotSeqCoverage</span>(<span class="at">seqCoverageObj =</span> cr, <span class="at">type=</span><span class="st">&quot;pie&quot;</span>,<span class="at">cov.level =</span> <span class="fu">c</span>(<span class="dv">30</span><span class="sc">:</span><span class="dv">45</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">MEDIPS.plotSeqCoverage</span>(<span class="at">seqCoverageObj =</span> cr, <span class="at">type =</span> <span class="st">&quot;hist&quot;</span>, <span class="at">t =</span><span class="dv">45</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">main =</span> <span class="st">&quot;Sequnce pattern Coverage&quot;</span>)</span></code></pre></div>
+<p>The CpG enrichment checking is done in MEDIPS by testing the
+enrichment of CpGs within the genomic regions covered by a given set of
+short reads compared to the full reference genome. The final score is
+given by dividing the relative frequency of CpGs of the regions by the
+relative frequency of CpGs of the reference genome.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>er <span class="ot">=</span> <span class="fu">MEDIPS.CpGenrich</span>(<span class="at">file =</span> rep1.bam, <span class="at">BSgenome =</span> BSgenome, <span class="at">chr.select =</span> <span class="dv">1</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>)</span></code></pre></div>
+</div>
+<div id="summary-of-cpg-enrichment" class="section level4">
+<h4>Summary of CpG enrichment</h4>
+<p>Lastly we run MEDIPS do find the differentially methylated
+regions,</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make MEDIPset for replicates and input</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Methyl_rep1 <span class="ot">=</span> <span class="fu">MEDIPS.createSet</span>(<span class="at">file =</span> rep1.bam, <span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">window_size =</span> ws, <span class="at">chr.select =</span> chr.select)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>Methyl_rep1 <span class="ot">=</span><span class="fu">c</span>(Methyl_rep1,<span class="fu">MEDIPS.createSet</span>(<span class="at">file =</span> rep2.bam, <span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">window_size =</span> ws, <span class="at">chr.select =</span> chr.select))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>Methyl_rep1 <span class="ot">=</span><span class="fu">c</span>(Methyl_rep1,<span class="fu">MEDIPS.createSet</span>(<span class="at">file =</span> rep3.bam, <span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">window_size =</span> ws, <span class="at">chr.select =</span> chr.select))</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>Input_methyl <span class="ot">=</span> <span class="fu">MEDIPS.createSet</span>(<span class="at">file=</span> input.bam, <span class="at">BSgenome=</span>BSgenome,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                                <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                                <span class="at">window_size =</span> ws, <span class="at">chr.select=</span>chr.select)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># make MEDIPSet for Mutant type and input</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>Mutant_rep1 <span class="ot">=</span> <span class="fu">MEDIPS.createSet</span>(<span class="at">file=</span>mutant1.bam, <span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                               <span class="at">window_size =</span> ws, <span class="at">chr.select =</span> chr.select)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>Mutant_rep1 <span class="ot">=</span> <span class="fu">c</span>(Mutant_rep1, <span class="fu">MEDIPS.createSet</span>(<span class="at">file=</span>mutant2.bam, <span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                               <span class="at">window_size =</span> ws, <span class="at">chr.select =</span> chr.select))</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>Mutant_rep1 <span class="ot">=</span> <span class="fu">c</span>(Mutant_rep1, <span class="fu">MEDIPS.createSet</span>(<span class="at">file=</span>mutant3.bam, <span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                               <span class="at">window_size =</span> ws, <span class="at">chr.select =</span> chr.select))</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>Input_Mutant <span class="ot">=</span> <span class="fu">MEDIPS.createSet</span>(<span class="at">file=</span>mutant.input, <span class="at">BSgenome =</span> BSgenome,</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                               <span class="at">extend =</span> extend, <span class="at">shift =</span> shift, <span class="at">uniq =</span> <span class="dv">0</span>,</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>                               <span class="at">window_size =</span> ws, <span class="at">chr.select =</span> chr.select)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co">#generate a coupling set</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>CS <span class="ot">=</span> <span class="fu">MEDIPS.couplingVector</span>(<span class="at">pattern =</span> <span class="st">&quot;CG&quot;</span>, <span class="at">refObj =</span> Mutant_rep1[[<span class="dv">1</span>]])</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co"># coverage and edgeR analysis</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>mr.edgeR <span class="ot">=</span> <span class="fu">MEDIPS.meth</span>(<span class="at">MSet1 =</span> Methyl_rep1, <span class="at">MSet2 =</span> Mutant_rep1,</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                       <span class="at">CSet =</span> CS, <span class="at">ISet1 =</span> Input_methyl, <span class="at">ISet2 =</span> Input_Mutant, <span class="at">p.adj =</span> <span class="st">&quot;bonferroni&quot;</span>,</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>                       <span class="at">diff.method =</span> <span class="st">&quot;edgeR&quot;</span>, <span class="at">MeDIP =</span> T,</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>                       <span class="at">CNV =</span> T, <span class="at">minRowSum =</span> <span class="dv">1</span>)</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="co">#find significant regions</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>mr.edgeR.s <span class="ot">=</span> <span class="fu">MEDIPS.selectSig</span>(<span class="at">results =</span> mr.edgeR, <span class="at">p.value =</span> <span class="fl">0.1</span>,</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>                              <span class="at">adj =</span> T, <span class="at">ratio =</span> <span class="cn">NULL</span>, <span class="at">bg.counts =</span> <span class="cn">NULL</span>, <span class="at">CNV =</span> F)</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="co"># merge neighbors</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>mr.edgeR.s.gain <span class="ot">=</span> mr.edgeR.s[<span class="fu">which</span>(mr.edgeR.s[,<span class="fu">grep</span>(<span class="st">&quot;logFC&quot;</span>,<span class="fu">colnames</span>(mr.edgeR.s))] <span class="sc">&lt;</span><span class="dv">0</span>),]</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>mr.edgeR.s.gain.m <span class="ot">=</span> <span class="fu">MEDIPS.mergeFrames</span>(<span class="at">frames =</span> mr.edgeR.s.gain, <span class="at">distance =</span> <span class="dv">0</span>)</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="co"># regions of interest</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>rois <span class="ot">=</span> <span class="fu">MEDIPS.selectROIs</span>(<span class="at">results =</span> mr.edgeR,<span class="at">rois =</span> mr.edgeR.s.gain.m,</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>                         <span class="at">columns =</span> <span class="st">&quot;counts&quot;</span>, <span class="at">summarize =</span> <span class="cn">NULL</span>)</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="co">#calibration plot</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="co">#MEDIPS.plotCalibrationPlot(CSet = CS, main = &quot;CalibrationPlot&quot;,</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co">#                           MSet = Mutant_rep1[[2]], plot_chr = &quot;1&quot;, xrange = T)</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="co">#correlation of medips set</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>cor.matrix <span class="ot">=</span> <span class="fu">MEDIPS.correlation</span>(<span class="at">MSets =</span> <span class="fu">c</span>(Methyl_rep1, Mutant_rep1, Input_methyl, Input_Mutant))</span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="deeptools" class="section level2">
+<h2>Deeptools</h2>
+<p>deepTools is a suite of python tools particularly developed for the
+efficient analysis of high-throughput sequencing data, such as ChIP-seq,
+RNA-seq or MNase-seq. We used this tool to calculate coverage and
+generate profile and heatmap plots</p>
+<div id="bamcoverage" class="section level3">
+<h3>BamCoverage</h3>
+<p>This tool takes an alignment of reads or fragments as input (BAM
+file) and generates a coverage track (bigWig or bedGraph) as output. The
+coverage is calculated as the number of reads per bin, where bins are
+short consecutive counting windows of a defined size. We define a bin
+size of 10 and normalize using Reads Per Kilobase per Million mapped
+reads (RPKM). The output is stored as bigwig files which can be found <a
+href="">here</a></p>
+<p>These bigwig files are used as the input for
+<code>multiBigwigSummary</code>, which computes the average scores for
+each of the files in every genomic region. The output generated in a
+compressed numpy array(.npz) which is used to generate Correlation and
+PCA plots.</p>
+<div id="correlation-plot" class="section level4">
+<h4>Correlation plot</h4>
+<p><img src="../../Data/Processed/Bam/Heatmap_Corr_All.png" width="550" style="display: block; margin: auto;" /></p>
+<p><img src="../../Data/Processed/Bam/Scatter_Corr_All.png" width="800" style="display: block; margin: auto;" /></p>
+<p>First we generate the plots to compare amongst the replicates, the
+correlation is calculated using <code>plotCoverage</code> function with
+Spearman’s method and heatmap and scatter plots are generated.</p>
+</div>
+<div id="coverageplots" class="section level4">
+<h4>Coverageplots</h4>
+<p><img src="../../Data/Processed/Bam/Methyl_coverage.png" width="49%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/TAYN_coverage.png" width="49%" height="39%" style="display: block; margin: auto;" /></p>
+<p>Next we get the PCA plots using the <code>plotPCA</code> function.
+Principal component analysis (PCA) can be used to determine whether
+samples display greater variability between experimental conditions than
+between replicates of the same treatment. PCA is also useful to identify
+unexpected patterns, such as those caused by batch effects or outliers.
+Principal components represent the directions along which the variation
+in the data is maximal, so that the information (e.g., read coverage
+values) from thousands of regions can be represented by just a few
+dimensions.</p>
+</div>
+<div id="pca-plots" class="section level4">
+<h4>PCA Plots</h4>
+<p><img src="../../Data/Processed/Bam/Scatter_Corr_All.png" width="800" style="display: block; margin: auto;" /></p>
+<p>Further we generate the coverage plot to calculate what percentage of
+reads</p>
+<p>Lastly we use the <code>plotFingerprint</code> function to generate
+the fingerprint plots</p>
+<p><img src="../../Data/Processed/Bam/Methyl_fingerprint.png" width="49%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/TAYN_fingerprint.png" width="49%" height="39%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="plotprofile" class="section level3">
+<h3>PlotProfile</h3>
+<p>The next step is to generate profile plot, however as a prerequisite
+we need to generate a matrix which contains scores per genome region and
+can be used as an input for generating heatmap and profile plot.</p>
+<p>The plot contains the scores over the peaks regions for the bigwig
+file.</p>
+<p><img src="../../Data/Processed/Bam/MCap1_profile.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/MCap2_profile.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/MCap3_profile.png" width="29%" height="39%" style="display: block; margin: auto;" /></p>
+<p><img src="../../Data/Processed/Bam/TAYNCap1_profile.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/TAYNCap2_profile.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/TAYNCap3_profile.png" width="29%" height="39%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="heatmaps" class="section level3">
+<h3>Heatmaps</h3>
+<p>Heatmaps with deeptools, combined and separately.</p>
+<p><img src="../../Data/Processed/Bam/MCap1_heatmap.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/MCap2_heatmap.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/MCap3_heatmap.png" width="29%" height="39%" style="display: block; margin: auto;" /></p>
+<p>For TAYNCap</p>
+<p><img src="../../Data/Processed/Bam/TAYNCap1_heatmap.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/TAYNCap2_heatmap.png" width="29%" height="39%" style="display: block; margin: auto;" /><img src="../../Data/Processed/Bam/TAYNCap3_heatmap.png" width="29%" height="39%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ngsplot" class="section level2">
+<h2>ngsplot</h2>
+</div>
+<div id="diffbind" class="section level2">
+<h2>DiffBind</h2>
+<p>An alternative to MEDIPS was to use the <code>DiffBind</code> package
+which was developed for detecting differetial binding sites for ChipSeq
+data. The required input for Diffbind is the bam files and the peaks
+called by <code>MACS2</code></p>
+<p>Show and plot the results:</p>
+</div>
+<div id="distance-of-interactions-from-transcriptional-start-site"
+class="section level2">
+<h2>Distance of Interactions from Transcriptional Start Site</h2>
+<p>To validate the <code>Chicane</code> model for use with RADICL-Seq
+data, we hypothesised that there would be a build up of interacitons
+found close to the Transcriptional Start Site of the RNA in question.
+Since this is more likely to occur due to random chance, we hoped
+<code>Chicane</code> would take this into account and that the
+significant interactions would not be all in this region.</p>
+<p><strong>NOTE</strong> - A significant proportion of all interactions
+are by MALAT1 and NEAT1 which can skew the data (discused in coding vs
+non-coding section). Thus all plots will also be shown excluding
+interactions from these RNA.</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

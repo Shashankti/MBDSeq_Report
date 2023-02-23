@@ -287,9 +287,36 @@ These bigwig files are used as the input for `multiBigwigSummary`, which compute
 for each of the files in every genomic region. The output generated in a compressed numpy array(.npz) 
 which is used to generate Correlation and PCA plots.
 
+#### Correlation plot
+
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Heatmap_Corr_All.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Scatter_Corr_All.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+
+
+
+
+
 First we generate the plots to compare amongst the replicates, the correlation is calculated using 
 `plotCoverage` function with Spearman's method and heatmap and scatter plots are generated.
 
+
+#### Coverageplots
+
+
+```{r, echo=FALSE, out.width = '49%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Methyl_coverage.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYN_coverage.png"))
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+ 
 
 Next we get the PCA plots using the `plotPCA` function. Principal component analysis (PCA) 
 can be used to determine whether samples display greater variability between experimental
@@ -300,9 +327,26 @@ information (e.g., read coverage values) from thousands of regions can be repres
 just a few dimensions.
 
 
+#### PCA Plots
+
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Scatter_Corr_All.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+
 Further we generate the coverage plot to calculate what percentage of reads
 
 Lastly we use the `plotFingerprint` function to generate the fingerprint plots
+
+
+```{r, echo=FALSE, out.width = '49%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Methyl_fingerprint.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYN_fingerprint.png"))
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+
+
 
 
 ### PlotProfile
@@ -313,9 +357,16 @@ input for generating heatmap and profile plot.
 
 The plot contains the scores over the peaks regions for the bigwig file.
 
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap1_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap2_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap3_profile.png"))
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
 
 
-
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap1_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap2_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap3_profile.png"))
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
 
 ### Heatmaps
 
@@ -323,83 +374,30 @@ Heatmaps with deeptools, combined and separately.
 
 
 
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap1_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap2_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap3_heatmap.png"))
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
 
+For TAYNCap
 
-
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap1_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap2_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap3_heatmap.png"))
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
 
 ## ngsplot
 
 
+
+## DiffBind
+
+An alternative to MEDIPS was to use the `DiffBind` package which was developed for 
+detecting differetial binding sites for ChipSeq data. The required input for Diffbind
+is the bam files and the peaks called by `MACS2`
+
 Show and plot the results:
-```{r}
-#add significant indicator
-res_non_b2b[,significant:=FALSE]
-res_non_b2b[q.value<0.05,significant:=TRUE]
-res_b2b[,significant:=FALSE]
-res_b2b[q.value<0.05,significant:=TRUE]
-plt_non_b2b_frag <-
-  ggplot(res_non_b2b, 
-       aes(x=significant,y=log(frag.length,base=10),fill=significant)) +
-    geom_violin(trim=FALSE,outlier.shape=NA)+
-    geom_boxplot(width=0.1,outlier.shape=NA)+
-    theme_cowplot()+
-    scale_fill_viridis(discrete=T,alpha=0.5)+
-    theme(legend.position="none")+
-    ylab("Log 10 length")+
-    xlab("Significant Interaction")+
-    ggtitle("Fragment Length Non-bait-to-bait interactions")+
-    theme(plot.title = element_text(size = 10))+
-    #remove outliers
-    coord_cartesian(ylim = quantile(log(res_non_b2b$frag.length,base=10), 
-                                          c(0.1, 0.9)))
-plt_non_b2b_bait <-
-  ggplot(res_non_b2b, 
-       aes(x=significant,y=log(bait.length,base=10),fill=significant)) +
-    geom_violin(trim=FALSE,outlier.shape=NA)+
-    geom_boxplot(width=0.1,outlier.shape=NA)+
-    theme_cowplot()+
-    scale_fill_viridis(discrete=T,alpha=0.5)+
-    theme(legend.position="none")+
-    ylab("Log 10 length")+
-    xlab("Significant Interaction")+
-    ggtitle("Bait Length Non-bait-to-bait interactions")+
-    theme(plot.title = element_text(size = 10))
-    #remove outliers
-    #coord_cartesian(ylim = quantile(log(res_non_b2b$bait.length,base=10), 
-     #                                     c(0.1, 0.9)))
-plt_b2b_frag <-
-  ggplot(res_b2b, 
-       aes(x=significant,y=log(frag.length,base=10),fill=significant)) +
-    geom_violin(trim=FALSE,outlier.shape=NA)+
-    geom_boxplot(width=0.1,outlier.shape=NA)+
-    theme_cowplot()+
-    scale_fill_viridis(discrete=T,alpha=0.5)+
-    theme(legend.position="none")+
-    ylab("Log 10 length")+
-    xlab("Significant Interaction")+
-    ggtitle("Fragment Length Bait-to-bait interactions")+
-    theme(plot.title = element_text(size = 10))
-    #remove outliers
-    #coord_cartesian(ylim = quantile(log(res_b2b$frag.length,base=10), 
-     #                                     c(0.1, 0.9)))
-plt_b2b_bait <-
-  ggplot(res_b2b, 
-       aes(x=significant,y=log(bait.length,base=10),fill=significant)) +
-    geom_violin(trim=FALSE,outlier.shape=NA)+
-    geom_boxplot(width=0.1,outlier.shape=NA)+
-    theme_cowplot()+
-    scale_fill_viridis(discrete=T,alpha=0.5)+
-    theme(legend.position="none")+
-    ylab("Log 10 length")+
-    xlab("Significant Interaction")+
-    ggtitle("Bait Length Bait-to-bait interactions")+
-    theme(plot.title = element_text(size = 10))
-    #remove outliers
-    #coord_cartesian(ylim = quantile(log(res_b2b$bait.length,base=10), 
-    #                                      c(0.1, 0.9)))
-gridExtra::grid.arrange(plt_non_b2b_frag,plt_non_b2b_bait,
-                          plt_b2b_frag,plt_b2b_bait,ncol=2)
-```
+
 
 ## Distance of Interactions from Transcriptional Start Site
 
@@ -409,23 +407,8 @@ Start Site of the RNA in question. Since this is more likely to occur due to
 random chance, we hoped `Chicane` would take this into account and that the 
 significant interactions would not be all in this region.
 
-**NOTE** - Since this analysis is based on distance, trans interactions which 
-account for `r round(nrow(res[is.na(distance)])/nrow(res)*100,1)`% of all 
-interactions, could not be included.
 
-```{r}
-#split by groups
-ggplot(res_stretch_cis, aes(log(distance,base=10), 
-                                fill = q_bin, colour = q_bin)) +
-    geom_density(alpha = 0.1)+theme_cowplot()+
-    scale_fill_viridis(name="Adj. P-value Bin",discrete=T)+
-    scale_colour_viridis(name="Adj. P-value Bin",discrete=T)+
-    geom_vline(xintercept=log(60000,base=10), colour="grey") +
-    geom_vline(xintercept=log(300000,base=10), colour="grey") +
-    annotate(x=log(60000,base=10),y=2,label="60Kb",vjust=2,geom="label")+
-    annotate(x=log(300000,base=10),y=2,label="300Kb",vjust=2,geom="label")+
-    xlab("Log 10 Distance from Interaction to RNA")
-```
+
 
 **NOTE** - A significant proportion of all interactions are by MALAT1 and NEAT1
 which can skew the data (discused in coding vs non-coding section). Thus all 

@@ -1,0 +1,11 @@
+name: "MBD/MeDipSeq-analysis"
+output_dir: "."
+navbar:
+  title: "MBD/MeDip-analysis"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About Data"
+      href: about.html
+    - text: "Comparision of peaks"
+      href: compare.html
