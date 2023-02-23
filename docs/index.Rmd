@@ -43,6 +43,11 @@ library(dplyr)
 library(genomation)
 library(biomaRt)
 library(GenomicRanges)
+library(DT)
+library(magick)
+library(patchwork)
+library(slickR)
+library(svglite)
 #library(ggpubr)
 ```
 
@@ -64,6 +69,8 @@ df <- data.frame(c(11872,19814,15099,109375,80700,82972)
 colnames(df) <- c("No. of Peaks","Replicates")
 DT::datatable(df, caption = "Peaks summay")
 ```
+
+
 
 
 ```{r}
@@ -113,6 +120,17 @@ MEDIPS takes the input of bam files and provides methods for quality control.
 - *CpG Enrichment* 
 
 
+
+
+```{r,echo=FALSE}
+num_reads <- c(222798571,222798571,243011542,237866546,322441579,257337546,250971747,275296486)
+maxTruCorr <- c(0.9999986, 0.9999986, 0.9999985, 0.9999939, 0.9999996, 0.9999996, 0.9999995, 0.9999947)
+maxEstCorr <- c( 0.9999993, 0.9999993, 0.9999993, 0.9999969, 0.9999998, 0.9999998, 0.9999998, 0.9999973)
+ names_list <- c("MethylCap1","MethylCap2","MethylCap3","MethylInput",
+                 "TAYNCap1","TAYNCap2","TAYNCap3","TAYNInput")
+```
+
+
 ```{r,eval=FALSE}
 
 rep1.bam <- "/scratch1/users/shashank.tiwari/MBDSeq/Bam/Methyl-Cap-1_fixed_sorted.bam"
@@ -152,19 +170,41 @@ MEDIPS.plotSaturation(sr)
 The saturation plots for wildtype data,
 
 
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+slickR(c("Images/MEDIPS/MBD/MCap1_Saturation.png","Images/MEDIPS/MBD/MCap2_Saturation.png","Images/MEDIPS/MBD/MCap3_Saturation.png","Images/MEDIPS/MBD/MCapInput_Saturation.png")) %synch% (slickR(names_list[1:4],slideType = 'p'))
+
+
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
 
 
 
 And for TAYN Mutant bam files,
 
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+slickR(c("Images/MEDIPS/MBD/TAYNCap1_Saturation.png","Images/MEDIPS/MBD/TAYNCap2_Saturation.png","Images/MEDIPS/MBD/TAYNCap3_Saturation.png","Images/MEDIPS/MBD/TAYNInput_Saturation.png")) %synch% (slickR(names_list[5:8],slideType = 'p'))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
+
+The summary is as follows, Genome-wide coverage saturation analysis produced two values for each sample: the saturation correlation (maxTruCor) which is based on sequential calculations using half of the reads, and the estimated correlation (maxEstCor) which is based on artificially doubling that half. Actual correlation and reproducibility falls between the results of these true and estimated values. 
 
 
-We next plot the correlation heatmap using MEDIPS
+
+```{r}
+df <- data.table(names_list,num_reads,maxEstCorr,maxTruCorr)
+DT::datatable(df)
+```
+
+
+
+
+
 
 
 
 Further the next step is to perform sequenec pattern coverage analysis to determine
 the number of CpGs and the depth of coverage per CpG.
+
 
 
 ```{r,eval=FALSE}
@@ -178,6 +218,27 @@ MEDIPS.plotSeqCoverage(seqCoverageObj = cr, type="pie",cov.level = c(30:45))
 MEDIPS.plotSeqCoverage(seqCoverageObj = cr, type = "hist", t =45,
                        main = "Sequnce pattern Coverage")
 ```
+
+
+
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+slickR(c("Images/MEDIPS/MBD/MCap1_CoverageHist.png","Images/MEDIPS/MBD/MCap2_CoverageHist.png","Images/MEDIPS/MBD/MCap3_CoverageHist.png","Images/MEDIPS/MBD/MCapinput_CoverageHist.png")) %synch% (slickR(names_list[1:4],slideType = 'p'))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
+
+
+
+
+
+**TAYCap**
+```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+slickR(c("Images/MEDIPS/MBD/TAYNCap1_CoverageHist.png","Images/MEDIPS/MBD/TAYNCap2_CoverageHist.png","Images/MEDIPS/MBD/TAYNCap3_CoverageHist.png","Images/MEDIPS/MBD/TAYNCapInput_CoverageHist.png")) %synch% (slickR(names_list[5:8],slideType = 'p'))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
+
+
+
+
 
 
 
@@ -197,7 +258,24 @@ er = MEDIPS.CpGenrich(file = rep1.bam, BSgenome = BSgenome, chr.select = 1,
 ```
 
 
+
+
 #### Summary of CpG enrichment
+
+```{r,echo=FALSE}
+relH_enrich <- c(5.85616040043202,5.85616040043202,5.85074132767095,4.39643619795925,
+                 5.59192926590715,5.49666359029923,5.57081088262585,4.39821883865697)
+
+GoGe_enrich <- c(0.252936196338412,0.252936196338412,0.25272202285982,0.203816492544782,
+                 0.25094174973812,0.247553825414661,0.250389957212048,0.203834741209848)
+```
+
+
+```{r}
+df2 <- data.frame(names_list, relH_enrich,GoGe_enrich)
+DT::datatable(df2)
+```
+
 
 Lastly we run MEDIPS do find the differentially methylated regions,
 
@@ -266,6 +344,11 @@ rois = MEDIPS.selectROIs(results = mr.edgeR,rois = mr.edgeR.s.gain.m,
 #correlation of medips set
 cor.matrix = MEDIPS.correlation(MSets = c(Methyl_rep1, Mutant_rep1, Input_methyl, Input_Mutant))
 ```
+
+The final results of the Differentially methylated regions determined
+by using edgeR are as follows
+
+
 
 
 ## Deeptools
@@ -394,7 +477,12 @@ knitr::include_graphics(c("Images/deeptools/MBD/TAYNCap1_heatmap.png", "Images/d
 
 An alternative to MEDIPS was to use the `DiffBind` package which was developed for 
 detecting differetial binding sites for ChipSeq data. The required input for Diffbind
-is the bam files and the peaks called by `MACS2`
+is the bam files and the peaks called by `MACS2`. The primary emphasis of the package 
+is on identifying sites that are differentially bound between sample groups. It
+includes functions to support the processing of peak sets, including overlapping
+and merging peak sets, counting sequencing reads overlapping intervals in peak sets,
+and identifying statistically significantly differentially bound sites based on 
+evidence of binding affinity (measured by differences in read densities). 
 
 Show and plot the results:
 
