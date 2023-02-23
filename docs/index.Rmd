@@ -290,13 +290,13 @@ which is used to generate Correlation and PCA plots.
 #### Correlation plot
 
 ```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
-knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Heatmap_Corr_All.png")
+knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/Heatmap_Corr_All.png")
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
 
 ```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
-knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Scatter_Corr_All.png")
+knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/Scatter_Corr_All.png")
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
@@ -313,7 +313,7 @@ First we generate the plots to compare amongst the replicates, the correlation i
 
 
 ```{r, echo=FALSE, out.width = '49%', out.height = "39%",fig.show = 'hold', fig.align='center'}
-knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Methyl_coverage.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYN_coverage.png"))
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/Methyl_coverage.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYN_coverage.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
  
@@ -330,7 +330,7 @@ just a few dimensions.
 #### PCA Plots
 
 ```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
-knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Scatter_Corr_All.png")
+knitr::include_graphics("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/Scatter_Corr_All.png")
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
@@ -341,7 +341,7 @@ Lastly we use the `plotFingerprint` function to generate the fingerprint plots
 
 
 ```{r, echo=FALSE, out.width = '49%', out.height = "39%",fig.show = 'hold', fig.align='center'}
-knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/Methyl_fingerprint.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYN_fingerprint.png"))
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/Methyl_fingerprint.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYN_fingerprint.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
@@ -358,13 +358,13 @@ input for generating heatmap and profile plot.
 The plot contains the scores over the peaks regions for the bigwig file.
 
 ```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
-knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap1_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap2_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap3_profile.png"))
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/MCap1_profile.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/MCap2_profile.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/MCap3_profile.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
 
 ```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
-knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap1_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap2_profile.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap3_profile.png"))
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYNCap1_profile.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYNCap2_profile.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYNCap3_profile.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
@@ -375,14 +375,14 @@ Heatmaps with deeptools, combined and separately.
 
 
 ```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
-knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap1_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap2_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/MCap3_heatmap.png"))
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/MCap1_heatmap.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/MCap2_heatmap.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/MCap3_heatmap.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
 For TAYNCap
 
 ```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
-knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap1_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap2_heatmap.png", "/home/shashank.tiwari/Methyl-seq/Data/Processed/Bam/TAYNCap3_heatmap.png"))
+knitr::include_graphics(c("/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYNCap1_heatmap.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYNCap2_heatmap.png", "/home/shashank.tiwari/Methyl-seq/MBDSeq_Report/Images/deeptools/MBD/TAYNCap3_heatmap.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
