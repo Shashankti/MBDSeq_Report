@@ -29,6 +29,7 @@ knitr::opts_knit$set(#root.dir = root.dir,
                      dpi = 350)  
 library(data.table)
 library(ggplot2)
+library(tidyverse)
 library(cowplot)
 library(MEDIPS)
 library(DiffBind)
@@ -107,17 +108,18 @@ In addition, MEDIPS provides the following MeDIP/MBD-seq specific functionalitie
 
 ### Running MEDIPS
 
-MEDIPS takes the input of bam files and provides methods for quality control.
-- *Saturation analysis* is used to identify given set of mapped reads is sufficient
+MEDIPS takes the input of bam files and provides methods for quality control. \
+
+* *Saturation analysis* is used to identify given set of mapped reads is sufficient \
   to generate a saturated and reproducible coverage profile of the reference genome,
-- Gives the output of estimated and trye correlation analysis. The main idea is that 
-  an insufficent number of short reads will not result in a saturated methylation profile.
-  Only if there is a sufficient number of short reads, the resulting genome wide coverage
-  profile will be reproducible by another independent set of a similar number of short reads.
-- *Sequence Pattern Coverage* used to test the number of CpGs covered by the given short
-  read and the read depth coverage per CpG.
-  
-- *CpG Enrichment* 
+* Gives the output of estimated and trye correlation analysis. The main idea is that  \
+  an insufficent number of short reads will not result in a saturated methylation profile. \
+  Only if there is a sufficient number of short reads, the resulting genome wide coverage \
+  profile will be reproducible by another independent set of a similar number of short reads. \
+* *Sequence Pattern Coverage* used to test the number of CpGs covered by the given short
+  read and the read depth coverage per CpG. \
+
+* *CpG Enrichment* 
 
 
 
@@ -277,7 +279,9 @@ DT::datatable(df2)
 ```
 
 
-Lastly we run MEDIPS do find the differentially methylated regions,
+Lastly we run MEDIPS do find the differentially methylated regions, we give provide 
+the input of MethylCap replicates and TAYNCap replicates along with the correspoding 
+inputs. The final output received is the list of merged differentially methylated regions.
 
 
 
@@ -346,13 +350,32 @@ cor.matrix = MEDIPS.correlation(MSets = c(Methyl_rep1, Mutant_rep1, Input_methyl
 ```
 
 The final results of the Differentially methylated regions determined
-by using edgeR are as follows
+by using edgeR are as follows(selected with adjusted pvalue < 0.1)
+
+```{r}
+mr.edgeR.s.gain <- fread("MEDIPS_sig.tsv",header = T)
+DT::datatable(mr.edgeR.s.gain[1:60,])
+```
+
+From here we extract the regions of interest:
+
+```{r}
+rois <- fread("rois_mbd.txt")
+datatable(rois[1:100,] %>% column_to_rownames(var = "V1"))
+
+```
 
 
+The list shows only the first few items from the list since the size is too large, 
+in total `39825` DMRs are detected by MEDIPS.
 
+
+The same analysis for MeDip and hMeDip data can be found [here]()
 
 ## Deeptools
 
+I also attempted to do QC checks on the bam files and generate heatmaps for 
+the binding regions of the peaks detected by `MACS2` using `deeptools`. \
 deepTools is a suite of python tools particularly developed for the efficient analysis 
 of high-throughput sequencing data, such as ChIP-seq, RNA-seq or MNase-seq. We used this 
 tool to calculate coverage and generate profile and heatmap plots
