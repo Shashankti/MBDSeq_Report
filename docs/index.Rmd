@@ -436,7 +436,7 @@ just a few dimensions.
 #### PCA Plots
 
 ```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
-knitr::include_graphics("Images/deeptools/MBD/Scatter_Corr_All.png")
+knitr::include_graphics("Images/deeptools/MBD/PCA_readCounts.png")
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
@@ -451,9 +451,7 @@ knitr::include_graphics(c("Images/deeptools/MBD/Methyl_fingerprint.png", "Images
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
-
-
-
+It determines how well the signal in the sample can be differentiated from the background distribution of reads in the control sample. An ideal input with perfect uniform distribution of reads along the genome (i.e. without enrichments ) and infinite sequencing coverage should generate a straight diagonal line. A very specific and strong enrichment will be indicated by a prominent and steep rise of the cumulative sum towards the highest rank. This means that a big chunk of reads from the  sample is located in few bins which corresponds to high. Our plots indicate that it is more difficult to distinguish between input and sample, however it does not mean that the experiment has failed.
 
 ### PlotProfile
 
@@ -463,37 +461,63 @@ input for generating heatmap and profile plot.
 
 The plot contains the scores over the peaks regions for the bigwig file.
 
-```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
-knitr::include_graphics(c("Images/deeptools/MBD/MCap1_profile.png", "Images/deeptools/MBD/MCap2_profile.png", "Images/deeptools/MBD/MCap3_profile.png"))
-#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```{r, echo=FALSE, out.width = '29%', out.height = "19%",fig.show = 'hold', fig.align='center'}
+slickR(c("Images/deeptools/MBD/MCap1_profile.png","Images/deeptools/MBD/MCap2_profile.png",
+         "Images/deeptools/MBD/MCap3_profile.png")) %synch% (slickR(names_list[1:3],slideType = 'p'))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
 ```
 
+**Next the heatmaps**
 
-```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+
+```{r, echo=FALSE, out.width = '29%', out.height = "29%",fig.show = 'hold', fig.align='center'}
+
+slickR(c("Images/deeptools/MBD/MCap1_heatmap.png","Images/deeptools/MBD/MCap2_heatmap.png",
+         "Images/deeptools/MBD/MCap3_heatmap.png")) %synch% (slickR(names_list[1:3],slideType = 'p'))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
+
+```{r, echo=FALSE, out.width = '29%', out.height = "19%",fig.show = 'hold', fig.align='center',eval=FALSE}
 knitr::include_graphics(c("Images/deeptools/MBD/TAYNCap1_profile.png", "Images/deeptools/MBD/TAYNCap2_profile.png", "Images/deeptools/MBD/TAYNCap3_profile.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
 ### Heatmaps
 
-Heatmaps with deeptools, combined and separately. 
+```{r, echo=FALSE, out.width = '29%', out.height = "19%",fig.show = 'hold', fig.align='center'}
+
+slickR(c("Images/deeptools/MBD/TAYNCap1_profile.png","Images/deeptools/MBD/TAYNCap2_profile.png",
+         "Images/deeptools/MBD/TAYNCap3_profile.png")) %synch% (slickR(names_list[6:8],slideType = 'p'))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
+
+**and now the heatmaps**
+
+
+```{r, echo=FALSE, out.width = '29%', out.height = "29%",fig.show = 'hold', fig.align='center'}
+
+slickR(c("Images/deeptools/MBD/TAYNCap1_heatmap.png","Images/deeptools/MBD/TAYNCap2_heatmap.png",
+         "Images/deeptools/MBD/TAYNCap3_heatmap.png")) %synch% (slickR(names_list[6:8],slideType = 'p'))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
 
 
 
-```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+
+```{r, echo=FALSE, out.width = '29%', out.height = "29%",fig.show = 'hold', fig.align='center',eval=FALSE}
 knitr::include_graphics(c("Images/deeptools/MBD/MCap1_heatmap.png", "Images/deeptools/MBD/MCap2_heatmap.png", "Images/deeptools/MBD/MCap3_heatmap.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
-For TAYNCap
 
-```{r, echo=FALSE, out.width = '29%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+
+```{r, echo=FALSE, out.width = '29%', out.height = "29%",fig.show = 'hold', fig.align='center',eval=FALSE}
 knitr::include_graphics(c("Images/deeptools/MBD/TAYNCap1_heatmap.png", "Images/deeptools/MBD/TAYNCap2_heatmap.png", "Images/deeptools/MBD/TAYNCap3_heatmap.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
 
-## ngsplot
 
+The plot is a heatmap for scores associated with genomic regions, which in our case are the peaks called by `MACS2`.
 
 
 ## DiffBind
@@ -507,22 +531,145 @@ and merging peak sets, counting sequencing reads overlapping intervals in peak s
 and identifying statistically significantly differentially bound sites based on 
 evidence of binding affinity (measured by differences in read densities). 
 
+
+### Running DiffBind
+
+The input given here is the list of the peaks generated by `MACS2` and the bam files 
+along with the input control files for both MethylCap and TAYNCap. Once the peak files 
+are read, a consensus peakset is generated based on the replicates provided for each sample. 
+Next the peaks are centered and trimmed and a counts matrix is generated based on 
+how many reads overlap each interval for unique samples
+
+
+```{r,eval=FALSE}
+library(DiffBind)
+
+#setwd("Me-Dip/")
+
+samples <- read.csv("Sample-Sheet_2.csv")
+samples
+#Sample-Sheet_2.csv
+DBdata <- dba(sampleSheet = samples)
+
+#DBdata
+
+#plot(DBdata)
+
+DBdata <- dba.count(DBdata,summits = 250, bUseSummarizeOverlaps=TRUE)
+#plot()
+
+DBdata <- dba.contrast(DBdata,categories = DBA_CONDITION,minMembers = 2)
+
+DBdata <- dba.analyze(DBdata)
+
+DBdata_all <- dba.analyze(DBdata,method = DBA_ALL_METHODS)
+
+
+plot1 <- dba.plotVolcano(DBdata)
+tiff("Figures/Volcano.tiff",width = 35,height = 21,units = 'cm',res = 300)
+plot(plot1)
+dev.off()
+plot2 <- dba.plotPCA(DBdata)
+tiff("Figures/PCA_C.tiff",width = 35,height = 21,units = 'cm',res = 300)
+plot(plot2)
+dev.off()
+plot3 <- dba.plotPCA(DBdata,contrast = 1)
+tiff("Figures/PCA_ID_2.tiff",width = 35,height = 21,units = 'cm',res = 300)
+plot(plot3)
+dev.off()
+plot4 <- dba.plotBox(DBdata) 
+tiff("Figures/BoxPlot.tiff",width = 35,height = 21,units = 'cm',res = 300)
+plot(plot4)
+dev.off()
+#dba.plotProfile(DBdata)
+profiles <- dba.plotProfile(DBdata)
+dba.plotProfile(profiles)
+
+report <- dba.report(DBdata,method = DBA_DESEQ2)
+report <- as.data.frame(report)
+```
+
 Show and plot the results:
+```{r}
+report <- fread("Dfbind_report.tsv")
+datatable(report[1:200,])
+
+```
+
+The plots generated are as follows, first we look at the heatmap to see the correlation 
+between the replicates and different samples, where 1,2,3 are MethylCap1, MethylCap2 and 
+MethylCap3 and 4,5,6 are TAYNCap1, TAYNCap2 and TAYNCap3 respectively
+
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("Images/DiffBind/MBD/DiffBind_Heatmap.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+* Next we plot the PCA plot to give a deeper insight into how the samples are correlated
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("Images/DiffBind/MBD/DiffBind_PCA_c.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+We can also get the plot for only the differentailly bound sites
 
 
-## Distance of Interactions from Transcriptional Start Site
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("Images/DiffBind/MBD/DiffBind_PCA_ID.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
 
-To validate the `Chicane` model for use with RADICL-Seq data, we hypothesised that
-there would be a build up of interacitons found close to the Transcriptional 
-Start Site of the RNA in question. Since this is more likely to occur due to 
-random chance, we hoped `Chicane` would take this into account and that the 
-significant interactions would not be all in this region.
-
-
+ * Next we plot a venndiagram to to illlustrate the overlaps between different sets of peaks. Here Gain represents an increased \   enrichment and Loss stands for a lower enrichment.
+ 
 
 
-**NOTE** - A significant proportion of all interactions are by MALAT1 and NEAT1
-which can skew the data (discused in coding vs non-coding section). Thus all 
-plots will also be shown excluding interactions from these RNA.
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("Images/DiffBind/MBD/DiffBind_Venn.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+ 
+ 
+ MA plots are a useful way to visualize the relationship between the overall binding level at
+each site and the magnitude of the change in binding enrichment between conditions, as well
+as the effect of normalization on data.
+
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("Images/DiffBind/MBD/DiffBind_MA.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+Each point represents a binding site, with the points
+in magenta representing sites identified as differentially bound. There is a blue horizontal
+line through the origin (0 LFC), as well as a horizontal red curve representing a non-linear
+loess fit showing the underlying relationship between coverage levels and fold changes. The
+plot shows how the differentially bound sites appear to have a minimum absolute log fold
+difference of somewhere between one and two \\
 
 
+
+
+Similar to MA plots, Volcano plots also highlight significantly differentially bound sites and
+show their fold changes. Here, however, the confidence statistic (FDR or p-value) is shown on
+a negative log scale, helping visualize the relationship between the magnitude of fold changes
+and the confidence that sites are differentially bound
+
+
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("Images/DiffBind/MBD/DiffBind_volcano.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+
+Boxplots provide a way to view how read distributions differ between classes of binding sites.
+
+
+```{r, echo=FALSE,fig.show = 'hold', fig.align='center'}
+knitr::include_graphics("Images/DiffBind/MBD/DiffBind_Boxplot.png")
+#knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
+```
+
+
+The default plot shows in the first two boxes that amongst differentially bound sites
+overall, the TAYN samples have a somewhat higher mean read concentration. The next
+two boxes show the distribution of reads in differentially bound sites that exhibit increased
+affinity in the TAYN samples, while the final two boxes show the distribution of reads in
+differentially bound sites that exhibit increased affinity in the MEthylCap samples.
