@@ -52,6 +52,8 @@ library(svglite)
 #library(ggpubr)
 ```
 
+
+
 ## Cleaning and Preprocessing
 
 The raw fastq files provided were first cleaned up using `trimgalore` to remove 
