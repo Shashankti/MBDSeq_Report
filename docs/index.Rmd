@@ -354,7 +354,7 @@ by using edgeR are as follows(selected with adjusted pvalue < 0.1)
 
 ```{r}
 mr.edgeR.s.gain <- fread("MEDIPS_sig.tsv",header = T)
-DT::datatable(mr.edgeR.s.gain[1:60,])
+DT::datatable(mr.edgeR.s.gain[1:60,],options = list(scrollX=TRUE))
 ```
 
 From here we extract the regions of interest:
@@ -387,7 +387,7 @@ This tool takes an alignment of reads or fragments as input (BAM file) and gener
 coverage track (bigWig or bedGraph) as output. The coverage is calculated as the number of
 reads per bin, where bins are short consecutive counting windows of a defined size. We define 
 a bin size of 10 and normalize using Reads Per Kilobase per Million mapped reads (RPKM). The 
-output is stored as bigwig files which can be found [here]()
+output is stored as bigwig files which can be found [here](https://owncloud.gwdg.de/index.php/s/jFriwPQHyMdwNvy)
 
 These bigwig files are used as the input for `multiBigwigSummary`, which computes the average scores
 for each of the files in every genomic region. The output generated in a compressed numpy array(.npz) 
@@ -592,7 +592,7 @@ report <- as.data.frame(report)
 Show and plot the results:
 ```{r}
 report <- fread("Dfbind_report.tsv")
-datatable(report[1:200,])
+datatable(report[1:200,],options = list(scrollX=TRUE))
 
 ```
 

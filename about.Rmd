@@ -1,0 +1,5 @@
+---
+title: "About Data"
+---
+
+We have the raw reads fastq files from two different sets of sequencing. The first set of data is comparision between Methyl-Cap and TAYN-Cap. The methyl cap is 
