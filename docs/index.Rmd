@@ -190,6 +190,15 @@ slickR(c("Images/MEDIPS/MBD/TAYNCap1_Saturation.png","Images/MEDIPS/MBD/TAYNCap2
 #knitr::include_graphics("~/Pictures/RBPFOX2.png")
 ```
 
+**Interpretaion of the plots**
+
+Saturation analysis addresses the question whether the given set of mapped reads is sufficient to generate a saturated and reproducible coverage profile of the reference genome. Only if there is a sufficient number of short reads, the resulting genome wide coverage profile will be reproducible by another independent set of similar number of short reads. The basis of analysis is to divide the read file into two equal sets and compare the genome wide coverages for subsets of the initial subsets with increasing total number of reads being compared. 
+
+The plots indicate that the samples satisfy the saturation/reproducibility criteria.
+
+#-------------------------------------------------------------------------------------------------------------#
+
+
 The summary is as follows, Genome-wide coverage saturation analysis produced two values for each sample: the saturation correlation (maxTruCor) which is based on sequential calculations using half of the reads, and the estimated correlation (maxEstCor) which is based on artificially doubling that half. Actual correlation and reproducibility falls between the results of these true and estimated values. 
 
 
@@ -242,6 +251,14 @@ slickR(c("Images/MEDIPS/MBD/TAYNCap1_CoverageHist.png","Images/MEDIPS/MBD/TAYNCa
 
 
 
+**Explanation for the plots**
+
+The main idea of the sequence pattern coverage analysis is to test the number of CpGs (or
+any other predefined sequence pattern) covered by the given short reads. In addition, the
+depth of coverage per CpG is tested.  The histogram shows the distribution of CpG coverages. The parameter t specifies the maximal coverage depth to be plotted (here: 40 reads). The percentage indicates what percentage of the total reads are not covered in CpG patterns.
+
+#-----------------------------------------------------------------------------------------------------------------#
+
 
 
 
@@ -275,10 +292,30 @@ GoGe_enrich <- c(0.252936196338412,0.252936196338412,0.25272202285982,0.20381649
 ```
 
 
+
 ```{r}
 df2 <- data.frame(names_list, relH_enrich,GoGe_enrich)
 DT::datatable(df2)
 ```
+
+**Explanation for the table**
+
+The slots enrichment.score.relH and enrichment.score.GoGe indicate the enrichment of CpGs within the
+given regions compared to the reference genome. For short reads derived from Input experiments (i.e. sequencing of none-enriched DNA fragments), the enrichment values should be close to 1. In contrast, a MeDIP-seq experiment should return CpG rich sequences what will be indicated by increased CpG enrichment scores. \\
+
+
+
+As a quality check for the enrichment of CpG rich DNA fragments obtained by the immunoprecipitation step of a MeDIP/MBD experiment, MEDIPS provides the functionality to calculate CpG enrichment values. The main idea is to test the enrichment of CpGs within the genomic regions covered by the given set of short reads compared to the full reference genome. For this, MEDIPS counts the number of Cs, the number of Gs, the number CpGs, and the total number of bases within the specified reference genome. Subsequently, MEDIPS calculates the relative frequency of CpGs and the observed/expected ratio of CpGs present in the reference genome. Additionally, MEDIPS calculates the same for the DNA sequences underlying the given regions. The final enrichment values result by dividing the relative frequency of CpGs (or the observed/expected value, respectively) of the regions by the relative frequency of CpGs (or the observed/expected value, respectively) of the reference genome.
+
+
+
+
+
+
+
+
+#----------------------------------------------------------------------------------------------------#
+
 
 
 Lastly we run MEDIPS do find the differentially methylated regions, we give provide 
@@ -420,10 +457,17 @@ First we generate the plots to compare amongst the replicates, the correlation i
 #### Coverageplots
 
 
-```{r, echo=FALSE, out.width = '49%', out.height = "39%",fig.show = 'hold', fig.align='center'}
+```{r, echo=FALSE, out.width = '69%', out.height = "69%",fig.show = 'hold', fig.align='center'}
 knitr::include_graphics(c("Images/deeptools/MBD/Methyl_coverage.png", "Images/deeptools/MBD/TAYN_coverage.png"))
 #knitr::include_graphics("/home/shashank.tiwari/Pictures/RBPFOX2.png")
 ```
+ 
+**Explanation for the plots**
+The plot is used to assess the sequencing depth of a given sample. In the plot we compare the different replicates with the input sample. The first plot represents the frequencies of the found read coverages, which helps in determining how relevant the mean coverage value(indicated in the plot) is. The second plot helps answer the question what is the fraction of the genome that has a depth of sequencing of 2? The plot1 for methyl cap shows that the input file has a lower percentage of bps which are sampled less than 8 times and the higher percentage of bps are sampled 9-22 times in the input sample. The second plot shows that 20 percent of sampled bp in replicates have atlease 15 overlapping reads, however the curve for the input sample differs from the rest of the replicates.
+
+#--------------------------------------------------------------------------------------------------#
+
+ 
  
 
 Next we get the PCA plots using the `plotPCA` function. Principal component analysis (PCA) 
@@ -468,6 +512,15 @@ slickR(c("Images/deeptools/MBD/MCap1_profile.png","Images/deeptools/MBD/MCap2_pr
          "Images/deeptools/MBD/MCap3_profile.png")) %synch% (slickR(names_list[1:3],slideType = 'p'))
 #knitr::include_graphics("~/Pictures/RBPFOX2.png")
 ```
+
+**Next the combined plots in one axis**
+
+```{r,echo=FALSE, fig.show='hold',fig.align='center', out.height="35%",out.width='29%'}
+slickR(c("Images/deeptools/MBD/MCap_combined_profile.png",
+         "Images/deeptools/MBD/TAYNCap_combined_profile.png")) %synch% (slickR(c("MCap","TAYNCap"), slideType = 'p'))
+
+```
+
 
 **Next the heatmaps**
 
