@@ -54,3 +54,14 @@ library(svglite)
 
 
 ## MEDIPS
+
+
+## Deeptools plots
+
+
+
+
+## DiffBind
+
+
+

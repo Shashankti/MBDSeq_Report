@@ -1,5 +1,19 @@
 ---
 title: "About Data"
+author: "Shashank Tiwari"
+date: "Most recent update:<br> `r Sys.Date()`"
+output: 
+  rmarkdown::html_document: 
+    theme: spacelab
+    highlight: zenburn 
+    code_folding: show 
+    toc: true 
+    toc_float: true
+    smooth_scroll: true
+    number_sections: false 
+    self_contained: true 
+editor_options: 
+  chunk_output_type: inline
 ---
 
 We have the raw reads fastq files from two different sets of sequencing. The first set of data is comparison between Methyl-Cap and TAYN-Cap. The methyl cap is data is the wild type and TAYNCap represents the mutant type reader developed by the lab. Methyl-CpG binding domain-based capture and sequencing (MethylCap , MBD-Seq , MBDCap-Seq , MBDCap) or MBD-isolated genome sequencing (MiGS ), uses proteins to capture methylated DNA in the genome. Genomic DNA is first sonicated and incubated with tagged MBD proteins that can bind methylated cytosines. The protein-DNA complex is then precipitated with antibody-conjugated beads that are specific to the protein tag. Deep sequencing provides greater genome coverage, representing the majority of MBD-bound methylated DNA.
