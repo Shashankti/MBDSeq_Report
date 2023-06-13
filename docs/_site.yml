@@ -9,3 +9,5 @@ navbar:
       href: about.html
     - text: "Comparision of peaks"
       href: compare.html
+    - text: "Annotation of peaks"
+      href: annotate.html

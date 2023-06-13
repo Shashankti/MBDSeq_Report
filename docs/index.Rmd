@@ -451,7 +451,7 @@ knitr::include_graphics("Images/deeptools/MBD/Scatter_Corr_All.png")
 
 
 First we generate the plots to compare amongst the replicates, the correlation is calculated using 
-`plotCoverage` function with Spearman's method and heatmap and scatter plots are generated.
+`plotCovrrelation` function with Spearman's method and heatmap and scatter plots are generated.
 
 
 #### Coverageplots
@@ -487,7 +487,6 @@ knitr::include_graphics("Images/deeptools/MBD/PCA_readCounts.png")
 ```
 
 
-Further we generate the coverage plot to calculate what percentage of reads
 
 Lastly we use the `plotFingerprint` function to generate the fingerprint plots
 
