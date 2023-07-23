@@ -1,0 +1,141 @@
+---
+title: "Analysis of MeDip-Seq data"
+author: "Shashank Tiwari"
+date: "Most recent update:<br> `r Sys.Date()`"
+output: 
+  rmarkdown::html_document: 
+    theme: spacelab
+    highlight: zenburn 
+    code_folding: show 
+    toc: true 
+    toc_float: true
+    smooth_scroll: true
+    number_sections: false 
+    self_contained: true 
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=T, message=F}
+#root.dir <- here::here()
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  #root.dir = root.dir
+  fig.height = 6,
+  fig.width = 7.00787 #178mm
+)  
+knitr::opts_knit$set(#root.dir = root.dir, 
+                     dpi = 350)  
+library(data.table)
+library(ggplot2)
+library(tidyverse)
+library(cowplot)
+library(MEDIPS)
+library(DiffBind)
+library(BSgenome)
+library(Rsamtools)
+library(edgeR)
+library(gtools)
+library(DNAcopy)
+library(rtracklayer)
+library(viridis)
+library(dplyr)
+library(genomation)
+library(biomaRt)
+library(GenomicRanges)
+library(DT)
+library(magick)
+library(patchwork)
+library(slickR)
+library(svglite)
+#library(ggpubr)
+```
+
+
+## Peaks from IgG Control
+The adapters were trimmed from raw files were trimmed using trimmotatic followed by alignment to genome using bowtie2. Lastly the aligned files were sorted and MACS2 was used for peak calling.
+Here is a short summary of the number of peaks with previous control and IgG control:
+
+```{r summary, echo=FALSE}
+df <- data.frame(Names=c("hMeDip-Rep1","hMeDip-Rep2","hMeDip-Rep3","MeDip-Rep1","MeDip-Rep2","MeDip-Rep3","hMeDip-Consensus","MeDip-Consensus","Consensus"),
+                 Input=c("303166","406184","381919","371387","323007","358875","226988","266843","78802"),
+                 IgG=c(63700,45371,49016,135097,117989,114220,27822,89319,8492))
+DT::datatable(df,rownames = F,options = list(scrollX=TRUE))
+```
+
+1. TAYN and WT consensus peak: 5898peaks
+2. hMeDip and MeDip consensus peak: 8492peaks
+3. DMRs from MEDIPS: 12521peaks
+4. DMRs intersected with MBDSeq and DipSeq consensus peaks: 80peaks
+5. DMRs intersected with only DipSeq consensus peaks: 965peaks
+6. DMRs intersected with WT negative and TAYN positive peaks: 832peaks
+
+
+## Annotating the peak regions
+I used the annotatePeaks tool from `homer` to annotate the enriched regions and then used Rscript to generate the plots. To annotate the location of a given peak in terms of important genomic features, annotatePeaks.pl calls a separate program (assignGenomeAnnotation) to efficiently assign peaks to one of millions of possible annotations genome wide. Two types of output are provided. The first is "Basic Annotation" that includes whether a peak is in the TSS (transcription start site), TTS (transcription termination site), Exon (Coding), 5' UTR Exon, 3' UTR Exon, Intronic, or Intergenic, which are common annotations that many researchers are interested in. A second round of "Detailed Annotation" also includes more detailed annotation, also considering repeat elements and CpG islands. Since some annotation overlap, a priority is assign based on the following (in case of ties it's random [i.e. if there are two overlapping repeat element annotations]): TSS (by default defined from -1kb to +100bp) TTS (by default defined from -100 bp to +1kb) CDS Exons 5' UTR Exons 3' UTR Exons *CpG Islands *Repeats Introns Intergenic ** Only applicable for the "Detailed Annotation".
+
+### DMRs intersected with MBDSeq and DipSeq consensus peaks
+
+```{r, echo=FALSE, out.width="49%", fig.align='center',fig.show='hold',fig.cap="DMRs intersected with DipSeq and CapSeq consensus peaks"}
+knitr::include_graphics(c("docs/Images/Annotate/IgG/DMR_prop/lower_level_tot.png","docs/Images/Annotate/IgG/DMR_prop/upper_level_tot.png"))
+#knitr::include_graphics("~/Pictures/RBPFOX2.png")
+```
+
+
+And the top motifs for these enriched regions are
+
+```{r, echo=FALSE, fig.align='center', fig.show='hold'}
+knitr::include_graphics("docs/Images/Annotate/Screenshot_20230723_161547.png")
+```
+
+Along with the CA and CG oligos account for 9.11% and 4.79% of the total reads in the peaks. I am working on a script to calculate this percentage for each of the peaks as well. I further calculated the percentage of CA and CG oligos in each of the peaks regions
+
+```{r, echo=FALSE}
+df <- data.table(fread("docs/IgG_DMS_sequences.tsv"))
+DT::datatable(df[,c(1,3,4,2)], options = list(scrollX=TRUE))
+
+```
+
+
+
+## DMR intersected with only TAYN positive and WT negative peaks
+
+
+```{r, out.width="49%", echo=FALSE, fig.show='hold', fig.cap="DMRs intersected with Dip consensus peaks only", fig.align='center'}
+knitr::include_graphics(c("docs/Images/Annotate/IgG/DMR_TAYN_with_dip/upper_level_tot.png","docs/Images/Annotate/IgG/DMR_TAYN_with_dip/lower_level_tot.png"))
+```
+
+
+
+## DMRS intersected only with Dip consensus peaks
+```{r, echo=FALSE, out.width="49%"}
+knitr::include_graphics(c("docs/Images/Annotate/IgG/DMR_onlyDip/upper_level_tot.png","docs/Images/Annotate/IgG/DMR_onlyDip/lower_level_tot.png"))
+```
+
+
+
+
+## Annotation of MeDipSeq peaks
+
+```{r, echo=FALSE, out.width="49%"}
+knitr::include_graphics(c("docs/Images/Annotate/IgG/MeDip/upper_level_tot.png","docs/Images/Annotate/IgG/MeDip/lower_level_tot.png"))
+```
+
+
+
+
+## Annotation of hMeDipSeq peaks
+
+```{r, echo=FALSE, out.width="49%"}
+knitr::include_graphics(c("docs/Images/Annotate/IgG/hMeDip/upper_level_tot.png", "docs/Images/Annotate/IgG/hMeDip/lower_level_tot.png"))
+
+```
+
+
+## Annotation of Consensus DipSeq peaks
+
+```{r, echo=FALSE, out.width="49%"}
+knitr::include_graphics(c("docs/Images/Annotate/IgG/DipConsensus/upper_level_tot.png", "docs/Images/Annotate/IgG/DipConsensus/lower_level_tot.png"))
+
+```

@@ -11,3 +11,5 @@ navbar:
       href: compare.html
     - text: "Annotation of peaks"
       href: annotate.html
+    - text: "IgG Peaks"
+      href: IgG.html
