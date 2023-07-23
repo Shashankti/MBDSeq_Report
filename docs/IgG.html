@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Shashank Tiwari" />
+
+
+<title>Analysis of MeDip-Seq data</title>
+
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/spacelab.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.28/datatables.js"></script>
+<link href="site_libs/dt-core-1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.13.4/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.13.4/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">MBD/MeDip-analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About Data</a>
+</li>
+<li>
+  <a href="compare.html">Comparision of peaks</a>
+</li>
+<li>
+  <a href="annotate.html">Annotation of peaks</a>
+</li>
+<li>
+  <a href="IgG.html">IgG Peaks</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Analysis of MeDip-Seq data</h1>
+<h4 class="author">Shashank Tiwari</h4>
+<h4 class="date">Most recent update:<br> 2023-07-23</h4>
+
+</div>
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#root.dir &lt;- here::here()</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">collapse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">comment =</span> <span class="st">&quot;#&gt;&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#root.dir = root.dir</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.height =</span> <span class="dv">6</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.width =</span> <span class="fl">7.00787</span> <span class="co">#178mm</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)  </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_knit<span class="sc">$</span><span class="fu">set</span>(<span class="co">#root.dir = root.dir, </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">dpi =</span> <span class="dv">350</span>)  </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MEDIPS)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DiffBind)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BSgenome)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Rsamtools)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(edgeR)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtools)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DNAcopy)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rtracklayer)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(genomation)</span></code></pre></div>
+<pre><code>## Warning: replacing previous import &#39;Biostrings::pattern&#39; by &#39;grid::pattern&#39;
+## when loading &#39;genomation&#39;</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biomaRt)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GenomicRanges)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magick)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(slickR)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(svglite)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#library(ggpubr)</span></span></code></pre></div>
+<div id="peaks-from-igg-control" class="section level2">
+<h2>Peaks from IgG Control</h2>
+<p>The adapters were trimmed from raw files were trimmed using
+trimmotatic followed by alignment to genome using bowtie2. Lastly the
+aligned files were sorted and MACS2 was used for peak calling. Here is a
+short summary of the number of peaks with previous control and IgG
+control:</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-afaa737cce88176b66b5" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-afaa737cce88176b66b5">{"x":{"filter":"none","vertical":false,"data":[["hMeDip-Rep1","hMeDip-Rep2","hMeDip-Rep3","MeDip-Rep1","MeDip-Rep2","MeDip-Rep3","hMeDip-Consensus","MeDip-Consensus","Consensus"],["303166","406184","381919","371387","323007","358875","226988","266843","78802"],[63700,45371,49016,135097,117989,114220,27822,89319,8492]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Names<\/th>\n      <th>Input<\/th>\n      <th>IgG<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"columnDefs":[{"className":"dt-right","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<ol style="list-style-type: decimal">
+<li>TAYN and WT consensus peak: 5898peaks</li>
+<li>hMeDip and MeDip consensus peak: 8492peaks</li>
+<li>DMRs from MEDIPS: 12521peaks</li>
+<li>DMRs intersected with MBDSeq and DipSeq consensus peaks:
+80peaks</li>
+<li>DMRs intersected with only DipSeq consensus peaks: 965peaks</li>
+<li>DMRs intersected with WT negative and TAYN positive peaks:
+832peaks</li>
+</ol>
+</div>
+<div id="annotating-the-peak-regions" class="section level2">
+<h2>Annotating the peak regions</h2>
+<p>I used the annotatePeaks tool from <code>homer</code> to annotate the
+enriched regions and then used Rscript to generate the plots. To
+annotate the location of a given peak in terms of important genomic
+features, annotatePeaks.pl calls a separate program
+(assignGenomeAnnotation) to efficiently assign peaks to one of millions
+of possible annotations genome wide. Two types of output are provided.
+The first is “Basic Annotation” that includes whether a peak is in the
+TSS (transcription start site), TTS (transcription termination site),
+Exon (Coding), 5’ UTR Exon, 3’ UTR Exon, Intronic, or Intergenic, which
+are common annotations that many researchers are interested in. A second
+round of “Detailed Annotation” also includes more detailed annotation,
+also considering repeat elements and CpG islands. Since some annotation
+overlap, a priority is assign based on the following (in case of ties
+it’s random [i.e. if there are two overlapping repeat element
+annotations]): TSS (by default defined from -1kb to +100bp) TTS (by
+default defined from -100 bp to +1kb) CDS Exons 5’ UTR Exons 3’ UTR
+Exons <em>CpG Islands </em>Repeats Introns Intergenic ** Only applicable
+for the “Detailed Annotation”.</p>
+<div id="dmrs-intersected-with-mbdseq-and-dipseq-consensus-peaks"
+class="section level3">
+<h3>DMRs intersected with MBDSeq and DipSeq consensus peaks</h3>
+<div class="figure" style="text-align: center">
+<img src="Images/Annotate/IgG/DMR_prop/lower_level_tot.png" alt="DMRs intersected with DipSeq and CapSeq consensus peaks" width="49%" /><img src="Images/Annotate/IgG/DMR_prop/upper_level_tot.png" alt="DMRs intersected with DipSeq and CapSeq consensus peaks" width="49%" />
+<p class="caption">
+DMRs intersected with DipSeq and CapSeq consensus peaks
+</p>
+</div>
+<p>And the top motifs for these enriched regions are</p>
+<p><img src="Images/Annotate/Screenshot_20230723_161547.png" width="344" style="display: block; margin: auto;" /></p>
+<p>Along with the CA and CG oligos account for 9.11% and 4.79% of the
+total reads in the peaks. I am working on a script to calculate this
+percentage for each of the peaks as well. I further calculated the
+percentage of CA and CG oligos in each of the peaks regions</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-f0b724a7fd8e2e2a45b2" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-f0b724a7fd8e2e2a45b2">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80"],["1:74191551-74191600","1:81692651-81693100","1:132072551-132072600","1:181751451-181752050","1:188793451-188793600","1:188793801-188793950","2:11744301-11745050","2:73817701-73817750","2:167990651-167990800","3:16011801-16011850","3:84411001-84411050","3:96842701-96842750","3:103955501-103956150","3:116288151-116288200","3:116843451-116843750","4:149881501-149881550","5:100017751-100017800","5:106779901-106779950","5:117435051-117435150","5:119728701-119728750","5:120640351-120640400","5:121036201-121036250","5:137488801-137488850","6:134691751-134692150","6:136328501-136328950","7:6251701-6251950","7:128204251-128204450","7:133593101-133593150","8:27074051-27074100","8:27074401-27074450","8:117729451-117729750","8:118439051-118439250","8:124507351-124507400","9:46964951-46965000","9:46965101-46965200","9:102758051-102758200","10:39971401-39972150","10:62223901-62223950","10:67942951-67943150","10:95865401-95865500","10:126922251-126922300","11:3825051-3825100","11:61594201-61594250","11:67678801-67678850","11:72468001-72468050","11:74376701-74376750","11:116944051-116944100","11:120043151-120043200","12:22440901-22440950","12:23775301-23775350","12:69460101-69460150","12:114014301-114014650","13:8769851-8770150","13:49800051-49800250","13:65378751-65379100","13:65451001-65451050","13:65782751-65783100","13:66639851-66640100","13:66714451-66714500","14:4822151-4822200","14:86914001-86914050","14:91992551-91992900","15:9015901-9016350","15:77030501-77030550","15:96480751-96480800","15:97662401-97662600","15:98937901-98937950","15:98938051-98938150","15:99871451-99871500","15:102020701-102020800","15:102367501-102367600","16:48540551-48540650","16:95873301-95873350","16:95873451-95873500","17:17167801-17168050","17:21150951-21151000","17:28108351-28108500","17:30652251-30652300","17:87694351-87694900","18:53960201-53960650"],[2.08,3.79,2.08,3.34,1.35,1.35,4.41,12.5,1.35,12.5,2.08,2.08,3.24,4.17,2.35,2.08,2.08,2.08,2.04,2.08,2.08,2.08,2.08,5.78,6.7,6.05,2.53,2.08,2.08,2.08,1.68,1.52,2.08,2.08,3.06,2.03,3.88,0,2.02,2.04,4.17,4.17,6.25,2.08,2.08,2.08,4.17,2.08,2.08,4.17,2.08,1.72,2.01,5.56,2.01,2.08,2.3,2.02,2.08,2.08,4.17,5.46,3.12,2.08,4.17,1.52,2.08,3.06,4.17,4.08,3.06,5.1,4.17,2.08,6.85,2.08,2.03,2.08,6.75,2.9],[31.25,7.59,29.17,11.2,0.68,0,6.42,22.92,37.16,10.42,29.17,4.17,3.86,31.25,19.46,27.08,27.08,27.08,31.63,2.08,27.08,0,33.33,8.039999999999999,8.039999999999999,7.66,6.57,37.5,0,2.08,2.01,22.73,31.25,0,1.02,26.35,14.17,35.42,2.53,3.06,27.08,12.5,4.17,0,29.17,33.33,35.42,0,2.08,2.08,31.25,15.8,2.68,2.53,4.02,0,24.71,4.44,4.17,2.08,8.33,4.89,19.64,4.17,0,27.78,41.67,36.73,25,26.53,2.04,5.1,25,22.92,5.24,2.08,2.7,33.33,0.18,10.94],["ACACATACACTGACACACACCACACACACATATACCACGCATACATACA","GCTGGATCCTTCTCAGCAGTCTGTTTTACGGGAACCTTCATTACCACCGTTCCCCAGCTGAAGAGTTCTGAATCCACGCTGGATCCTTCTCAGCAGTTTGTTTTACGGGAACCTTTATTACCACCGTTCCCCAGCTGAAGAGTTCTGAATCCACGCTGGATCCTTCTCAGCAGTCTGTTTTACGGGAACCTTTATTACCATCGTTCCCCAGCTGAAGAGTTCTGAATCCACGCTGGATCCTTCTCAGCAGTCTGTTTTACGGGAACCTTCATTACCACCGTTCCCCAGCTGAAGAGTTCTGAATCCACGCAGTCGGATCCTTCTCAGCAGTCTGTTTTGCAGGAACACTTCATTACCACCGTTCCCCAGCTGAAGAGTTCTGAATCCATGCTGGATCCTTCTCAGCAGTCTGTTTTACGGGAACCTTCATTAACCGCTCCTTCCCCGTG","CATATACACACACAAGTACACACTCACAGATACACTCACGCACATTCAC","GTACATCTCATGTGACCCGTTCTCCCTAACATACATGTCATGTGACACATTCTCCCTAACGTGCATCTCATGTGACACGTTCTCCCTAACATACATGTCATGTGACACGTTCTCCCTAATGTACATCTCATGTGACACGTTCTCCCTAACGTACATGTCATGTGACACATTCTCCCTAACGTGCATCTCATGTGACACGTTCTCCCTAACATACATGTCATGTGACGCGTTCTCCCTAACATACATCTCATGTGACGTGTTCTCCCTAACATACATGTCATGTGACACATTCTCCCTAACGTGCATCTCATGTGACATGTTCTCCCTAACATACATGTCATGTGACACGTTCTCCCTAATGTACATCTCATGTGACACGTTCTCCCTAACATACATGTCATGTGACGCGTTCTCCCTAACATACATCTCATGTGACGTGTTCTCCCTAACATACATGTCATGTGACACATTCTCCCTAACGTGCATCTCATGTGACATGTTCTCCCTAACATACATGTCATGTGACGCATTCTCCCTAACATACCTGTCATGTGACACGTTCTCCCTAGGTGTTCTTGAGGCTCAAGAAGATTTTAAAT","TGTGTCTGTGTGTGTGTCTGTATGTGTCTGTGCGTGTGTGTCTGTGTGTCTGTGTATGTGTGTCTGTGTGTCTGTATGTGTCTGTGTGTGTCTGAATGTGTCTGTGTGTGTGTCTGCATGTGTCTGTGCGTGTGTGTCTGTGTGTCTGT","TGTCTGTATGTGTCTGTGCGTGTGTGTCTGTGTGTCTGTGTGTGTGTGTCTGTGTGTCTGTATGTGTCTGTGTGTGTCTGTATGTGTCTGTGTGTGTGTCTGTATGTGTCTGTGCGTGTGTGTCTGTGTGTCTGTGTGTGTGTCTGTGT","CACAGCGTATTCCTGTCTCCACTGCGTGTTCCTGTCTCCACTGCGTGTTCCTGTCTCCACTGCGTATTCCTGTCTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTCTCCACTGCGTATTCCTGTCTCCACTGCATATTCCTGTCTCCACTGCGTGTTCCTGTCTCCACTGCATATTCCAGTCTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTCTCCACTGCATATTCCTGTCTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTCTCCACTGCATATTCCTGTGTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTCTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTGTCCACTGCGTATTCTTGTCTCTACTGCGTATTCCTGTCTCCACTGCGTGTTCCTGTCTCCACTGCATATTCCAGTCTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTCTCCACTGCATATTCCTGTCTCCACTGCATATTCCTGTGTCCACTGCGTATTCCTGTGTCCACTGCGTATTCCTGTCTCCACTGCGTATTCCTGTGTCCACTGCGTATTCTTGTCTCCACTGCGTATTCCTGTCTCCACTGCGTATTCCTGTGTCCACTGCGTATTCTTGTCTCTACTGCGT","ACTAGTGGAAGATGCACACACACGCGCGCGCGCGCACACACACACACAC","CACACAGCACACACGCATACACACACAGCACACACACATACACACACAGCACACATATACACACACAGCACACACATACACATATACACAGCACAGACACACATAGCACACACCACATACACACCACACACACATACGCATATACACAG","AATTGTCGCGCCCGCTCTCGACCAGCAAGAACAACGCGACCACCAGTCC","CACATACACACACTCACACGTACTCACATGTTTACACACTTACACACAC","GCTTGTAGGGATGGGGCGTGATGTGTGTGTCTGTGCACATGTATGTGGG","ATGTGACTCAATCGATAGAATACTTGCTCAGCATGTATTTTCTTTTCTTTTTTCTCTTTATATGTGTGTTGTACTAGTATGGTATTTGTACGTGTACTTGTGGATGTATGCACATGTGTTGTACGAGTATGGTATTTGTACGTGTACTTGTGGATGTATGCACATGTGTTGTACGAGTATGGTATTTGTACGTGTACTTGTGGATGTATGCACATGTGTTGTACGAGTATGGTATTTGTACGTGTACTTGTGGATGTATGTACATGTGTTGTACGAGTATGGTATTTGTACGTGTACTTGTGGGTGTATGCACATGTGTTGTAAGAGTATGGTATTTGTAAGTGTACTTGTGGATGTATGCACATGTGTTGTACGAGTATGGTATTTGTACGTGTACTTGTGGATGTATGCACATGTGTTGTACGAGTATGGTATTTGTACGTGTACTTGTGGGTGTATGCACATGTGTTGTACGAGTATGGTATTTTTACGTGTACTTGTGGATGTATGCACATGTGTTATACGAGTATGGTATTTGTACGTGTACTTGTGGGTGTATGCACATGTGTTGTACAAGTATGGTATTTGTACGTGTACTTGTGGATGTATGCACATGTGTTGTACGAGTATGGTATTTGTACGTGTACTT","CAACACATACACGGCACACTACACACACATCACTCGTACACAATACACA","ATAACTATCACACTCACAGACATAGATACGTAACTATCACACTCACAGACATGGATACATAACTATCACACTCACAGACATGGATACATAACGATCACACTCTCAGACATGGATACATAACTATCACACTCACAGACATGGATACATAATGATCACACTCACAGACACGGATACATAACTATCACACTCACAGACACGGATACATAACGATCACACTCACAGACACGGATACATAACTATCACACTCACAGACATGGATACATAACTATCACACTCACAGACACGGATACATAACTATC","AACACACAGAGACGCATACACACAGAAACACAAATATAGACACACACAT","GGCGCACATCACCCACACAGAAACACATACATGCATGTACACATAAACA","GCACAATAAACACATACATATAAACACACACAGATGCACGCATGCACAC","CACACCCACACACTCACTCACACACACGCAGCCATACACATACACACTCACACACTCTCACGCACAGTCATATACATATTCACACACACTCTCACACAT","TGTATAGGGGTATGAGTGTGTGTGTCTATGCGTGTGTACATGTGAGTGT","GCACACACATGCACAAACACGTGTGTACACACTCAAACATGCAAACATG","TGTGTATGTTTGTTTTGTGGTGTGTGTGTATGTATACGTGTTGTGTGTG","ACATACACACATACACACACAATACACATACGCACACATACACACATAA","AGCAACCACTGACTGCTGAAAGTTCTGAACTCGGTGGGGGAGTCGGTTCCCCGTACGGGCCACCAATTGTCGCGTCTGCTCTCGACCAGCAAGAACGACACGACCACCAGTCCTTCTAACAGCAGCTTATTCAGTCTTCATCTTTCTTCTTTCTCTTCATCAGTACCGTTCCCCAGCTGAAGAGTTCTGAATCCACGCCGGATCCTTCTCAACAGTCTGTTTTACAGGAACCTTTATTAACAGCTCCTTCCCCATGATGCAGTTCTGAATCCTCCCTGTAGCAGGGGGTCTTCGCTCGTGCCTGAAGATGTTTCTTGTCCCGGGTTTCGGCACCAACTCTCGAGCGCGCCCCCAACTCGCCAGCAAGAACGACGCTGCTACAGGATCCTTCTGCACACG","GTAAATAAAAAATTTTAAGGTCTTTCAGCGGAATCGGGATCATGGCGACCACGACCAGGATGGCGACGTCTGGCTCGGCGCGGAAGCGGCTGCTCAAAGAGGACGGCATGACCAAAGTGGAGTTCGAGACCAGCGAGGAGGTGGACGCGACCCCCACGTTCGACACCATGGGCCTGCGAGAGGACCTGCTGCGCGGCATCTACGCCTACGGTTTTGAAAAACCTTCAGCGATCCAGCAGCGTGCTATCAAGCAGATAATGAAAGGGAGAGATGTCATCGCACAGTCTCAGTCTGGCACAGGCAAGACGGCCACCTTCAGTATCTCAGTGCTCCAGTGCTTGGATATCCAGGTTCGAGAAACCCAAGCTTTGATCCTGGCTCCAACCAGAGAGTTAGCGGTGCAGATTCAGAAGGGTCTGCTCGCTCTGGGAGATTACATGAACGTGCAG","CACTGACTGCTGAAAGTTCTGAACTCGGTGGGGGAGTCGGTTCCCCGTACGGGCCACCAATTGTCGCGCCCGCTCTCGACCAGCAAGAACGACGCGACCACCAGTCCTTCTAACAGCAGTTTATTCAGTCCTCATCTTTCTTCTTTCTCTTCATCAGTACCGTTCCCCAGCTGAAGAGTTCTGAATCCACGCCAGATCCTTCTCAACAGTCTGTTTTACGGGAACACTTTATTAACCCCTTCTTCCCCG","TGCGTGCCTGTGTGTGTATATATGAGTGCGCATATGTACATGTGTATATGACTGTGTGTGTGCATGTGTGCGCACATGCATGCACATGTGTGTGTTTGTGTGTATTGTGTGCCTGTGTGCATGAGTGTTTGTGTGCACATGTGTGTATATGAGTGCGCATATGTGCATATGTATATGACTGTGTGTGTGCGTGTGTGTG","AAACACGCACACACATACACACACACTGACACACACACATACACACACA","TGTGAGTGTGTGAGTGTGTGAGTGTGTGTGTATGTTAGTCGTGTGTGTG","TATGTTAGTCGTGTATGTGAGTGTGTGAGTGTGTGTATGTTAGTCATGT","TGAACGTGTGTGTTTGCGTGTGTGGCTGTGAGAGCATGTGTGTGTCTGTGTGTGAGCATGTGTATCTGTGTGTATAATGTGTGAGTGTGTGTATATATGTGTGGTGTATGTATATGTGATGTGTGTATGTGCCCTGTGTCTGTGTGCGAGGGTGTATGGTATGTGTGCTTGATGTATGTGAGTGTGAATGTGTATATATGTGTGCATTCAAGAGCATGTGTGTGTGGTGTATGTGGGTGAGTGCGTGTATATGTGTGTGATGTGTAGTAAATGTGTGTGTGAGCATGAGTACGTGTGTA","CATACACAGATACTGCACACAAATAACACACATGCGCACACACATGCATACATGCTACATATACTACACATACAATATACACATACTACATGCACACACATATACTACATACTCATGTACACGCATATACTACATGCACATGTACATAACACACATACACACATATGCACACGTACTACATATACTACACATACTATAC","ACACGTACATACACATACACACACATAAACACACATACACATATACACA","GTGTGTGAGAGAGAGTATGTATATGAGAGTGTATATGTTTTTGTTAGCG","GTGTACGTGTAAGAGAGTACGTATATGAGCATGTGTATGTTTTTGTTAGTGTGTGTGTATGTGAGAGTGTGTGAATGTGCGTATGTGTGATTGTGTGTA","ACACACATCTACACATTCAGCACATGTGCACACCATACATACGTGCATACCACCACAATACCCACCACGCACATACACACACATACACACACCACACTCTTACACACATACACACACCATGTACACTCCCTTCATACGTGTACAGAATG","TGTAAGATCTCTGCACACACTGTCTCGTACTTACACATGACGTAAGATCTCTACACACACCGTCTCATACTTACACATGATGTAAGATCTCTACACACACCGTCTCATACTTACACATGACGTAAGATCTCTGCACACACTGTCTCGTACTTACACATGACGTAAGATCTCTGCACACACTGTCTCGTACTTACACATGACGTAAGATCTCTACACACACCGTCTCATACTTACACATGATGTAAGATCTCTACACACACCGTCTCATACTTACACATGACGTAAGATCTCTGCACACACTGTCTCGTACTTACACATGACGTAAGATCTCTACACACACCGTCTCATACTTACACATGATGTAAGATCTCTACACACACCGTCTCATACTTACACATGACGTAAGATCTCTGCACACACTGTCTCGTACTTACACATGACGTAAGATCTCTGCACACACTGTCTCGTACTTACACATGACGTAAGATCTCTACACACACTGTCTCATACTTACACATGACGTAAGATCTCTACACACACTGTCTCGTACTTACACATGACGTAAGATCTCTACACACACTGTCTCATACTTACACATGATGTAAGATCTCTACACACACCGTCTCATACTTACACATGACGTAAGATCTCTACACACACTGTCTCATACTTACACATGACGTAAGATCGCTGCACACACTGTCTCGTACTTACACATGACAGCCAACCAGGCACATTAGCAAAGGCTT","GTATATACACACACACACACACACACATATGAACACATACACACACACA","TGTGTGTGCATATACGTGTGTTGTCTATGTGTGAATGTGTGTGTGTGTGCATATACGTGTGTTGTCTATGTGTGAATGTCTGTGTGTGTGCATATACTTGTGTTGTCTATGTGTGAATGTGTGTGTGTGCATATACGTGTGTTGTCTATGTGTGAATGTCTGTGTGTGGGCATATACGTGTGTTGTCTATGTGTGAATG","TGTGTGTATGCATGTGTATGTGTGTATGGGTATGTGTATACCTATGCGTGTGTGTATATGTCCACATGTGTGTATGTGTGTATATGCGTGTCTCTGTGT","CATAGACAAAAACACGCATACACACACGCAACAGAGACACAAACATACA","CATACACCTCCCGGTCAGGGCTACCGAGGAGTACCCTACACATACACCT","TGTTGAGAAGGATCCGGCGTGGATTCAGAACTCTTCAGCTGGGGAACGG","TATGTATGTGTGTGTCTATGTGTGTCTGTGTGTATGTATGTGCGTGTAT","CACTATCTCTTACACACAGTCACACATACTCTCACACACACACGCACAC","CACACAGCATACACATACAACATACACAAACACACATGCGTACAACACA","CACACACAGTCGCACATACACACGCACACACACAGACATACAGTCACAT","TATGTATGTGTGTGTATGTATGCGTGTGTGTGTATGTATGTGTGTATGT","GTGTGCGTGTTTTTGTGGGGGCATGGTTATGTGTGTGTGTTTGGTGTAT","TGGTATATGTGCGTGTGCGTGCTTTTGTGGGGGCATGATTATGTGTGTG","TACAACATACACAACACACAGAAACAAACACATACACCGCACACAAACA","TGTGTGTACACATCATCTCGTATATATCATCCATGTGTGTACACATCATCTCATATATATCATCCATGTGTGTAGGTATCATTTCGTACATATCATCCATGTGTGTACACATCATCTCATACATATCATCCATGTGTGTACATATCATCTCATACATATCATCCATGAGTGTACGTACCATCTCGTACATATCATCCACATGTGTATACATCATCCTGTACATATCATCCAAGTGTGTACACATCCTCTTGTACATATCATCCATGTGTGTAGGTATCATTTCGTACATATCATCCATGTGTGTACACATCATCTCGTATATATCATCCATGTGTGTACACATCATCTC","ACGTGTGATGTGTCTGTGTGGTGTGTAGTGGGTGTGTGTCTGTGTGGTGCGTGGTGTGTGGTATGTGTGTGTCTGTGTCTCTGTGTGTGTGGTATGTGTGTACGTGTGCATGGGTACATGTGTGTGTGCACATCTATTGTGTCTGTGTGGTGTGTGGTGGGTGTGTGTCTGTGTGGTGTGTGGTATGTGTGTGTGTCTGTGTCTCTGTGTGTGTGGTGTGTGTGTACGTGTGCATGGGTACATGTGCGTGTGCACATGTGATGTGTCTGTGTGGTGCGTGGTGTGTGGTATGTGTGTGT","AAAGGTGGTAATAAAGTGTTCCCGTAAAACAGACTGTTGAGAAGGATCCGGCGTGGATTCAGAACTCTTCAGCTGGGGAACGGTACTGATGAAGAGAAAGAAGAAAGATGAAGACTGAATAAACTGCTGTTAGAAGGACTGGTGGTCGCATCGTTCTTGCTGGTCGAGAGCGGGCGTGACAATTGGTGGCCCGTACGGG","GCGTATGAGGCATGTGTTGAGGCATGTGTTGAGGCATGTGTGAGGCGTGTGTGGTGTGTGTGTGTGTGTGAGGCTAGTGTGAGGCATGTAAGACATGTGTGAGGCGTGTGTATGAGGCCTGTGAGGTATGTGTGTGAGGCATGTGTGGTGTGTGTGTGAAGCTAGTGTGAGGCATGTGAGAGATGTGTGAGAGGCATGTGTGAGGCGTTGGAGGTATGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGAGGCTAGTGTGAGGCATGTGAAACATATGTGAGACGTGTTTGTGAGGCTCGTGTGAGGAGCATGTGAGGCGTGTGTGTGAAAAGCACACAGGAGA","TGTGTGAGGCGTTGGAGGTATGTGTGTGTGTGTGAGGCTAGTGTGAGGC","CACACACACCTCTTATGCCTCACACACGCCTCACACACATACCTCACAGGCCTCACACACACCTCACACATGTCTCACATGCCTCACACTAGCCTCATACACACACGCACAAACACCATACACGCCTCACACACACAACCTCTCATGCCTCACACATGCCTCACACATAGGCCTCACACTAGCCTCACACACACACCACACATGCCTCACACATGCCTCAACATATGCCTCATACGCACCACACACACACACACACACACACACACACACACACACTCCGCATGCATTCTTCCTTCACTCACTCGCTCTCCACCGGCTCTTCTCAGGCTCTCTCGCCTTCTTCTTGCCC","AGATATGTGTGAGGCGTGTGTGTGAGGCCTGTGAGGTATGTGTGTGAGGCGTGTGTGGTGTGTGTGTGAACCTACTGTGAGACATTTGAGACATGTGTGAGAGGCATGTGGGAGGCGTGGGAGGTGTGTGTGTGTGTGTGAGGCTTGTGTGAGGCATGTGAGACATGTGTGAAGCATGTTTGTGAGGTATGTGTGTGGTGTTGTGAGGCGTGTGTGTGAAAAGCACACAGGAGAAAGCAGAGCTCGCAG","TGTGAGGCTAGTGTGAGGCATGTGAAACATGTGTGAGACGTGTTTGTGA","TGTGTGTGCATGTGTGTGTATGTGTGTGTGTGCGTGTGTGTGTGTGTGT","CGGATCCTTCTCAACAGTCTGTTTTACGGGAACACTTTATTAACCACTC","CGAGCGAAGACCCCCTGCTACAGGGAGGATTCAGAACTGCATCACGGGGAAGGAGTGGTTAATAAAAGTTCCCGTAAAACAGACTGTTGAGAAGGATCCGGCGTGGATTCAGAACTCTTCAGCTGGGGAACGGTACTGATGAAGAGAAAGAAGAAAGATGAGGACTGAATAAACTGCTGTTAGAAGGACTGGTGGTCGTGTCGTTCTTGCTGGTCGAGAGCAGACGCGACAATTGGTGGCCCGTACGGGGAACCGACTCCCCCACCGAGTTCAGAACTTTCAGCAGTCAGTGGTTGCCGGCAGGGTAAGTTCACGGTGAGTGAAACTTGCGACCCCAGGAGTTTGGGAA","ATACACACGCATGTACACACGCACTCCCCTGCTGCACACTCACAAGTGCACATATACTACAAATGCATGATACACACGCATGTACACACGCACTCCCCTGCTGCACACTCACAAGTGCACATATACTACAAATGCATGATACACACGCATGTAGACACGCACTCCCCTGCTGCACACTCACAAGTGCACATATACTACAAATGCATGATACACACGCATGTAGACACGCACTCCCCTGCTGCACACTCACAAGTGCACATATACTACAAATGCATGATACACACGCATGTACACACGCACTCCCCTGCTGCACACTCACAAGTGCACATATACTACAAATGCATGATACACACGCATGTACACACGCACTCCCCTGCTGCACACTCACAAGTGCACATATACTACAAATGCATGATACACACGCATGTACACACGCACTCCCCTGCTGC","GTGTGTTCATGTCTTTGTGTATGCATGTGTCTACGTGTCTATGTGTGTA","TTGTGTGTGCGTTGTGTGTGTATGTGTGTGTTTGCGTGTGTATGTGTGT","TACATACACACATACATATACACGCATACACACATATATACATACATACATACACACATGCATACATACATGCATACACACATACATATACACGCATACACACATATATACATACATGCATACACACATGCATACATACATGCATACACACATACATATACACGCATACACACATACATACACACACATGCATGCATGC","CACACACACACACTCACACACACACTCACACACACACACACCCACGCAC","CACACACACACGCACACACTCACACACACACACACACACACTCACTCACACACACACACACACACACACACACACACATGCGCCCCCGCAAACTCTGTA","ACGCATACAGACATACATATACACACATACAAACATACACGCATACACT","CACACATACAGACACGCACACTCACTCATGTACAGACACGCATGTATACACATACACATGTACACACACGTACACACAGACACACAGGTTTGCACGAGA","ATGTGTGAGTGTGCATTTGTGTGTACGTGTATGCGTGTATATGTGTATGTGTGTGCATATATGTGAATGTATGTATATGTATGTGTGTTCGTGTATGTG","CTGCATCACGGGGAAGGAGTGGTTAATAAAAGTTCCCGTAAAACAGACTGTTGAGAAGGATCCGGCGTGGATTCAGAACTCTTCAGCTGGGGAACGGTA","ATACACGTATCATACACACACCATACACACTACACATGCACGAATACAT","GCATGCACGTGCAACCACACACACTTGTACACACTACATGTACTTACAT","CTCAACAGTCTGTTTTACGGGAACCTTTATTAACCACTTCTTCCCCGTTATGCAGTTCTGAATCCTTCCTGTAGCAGGGGGTCTTCGCTCTTGTCTGAAGATGTTTCTTGTCCCGGGTTTTCTTGTATTTTCTCGTCCCGGGTTTTCTCGTCCCGTCCCGAGTTTTTCTTCCCGGGTTTCGGCACCAACTGTTGCGCGCGCTCAACAGGCCAGGAAGAACGACGCTGCTACAGGATCCTTCTGCACACG","CAGTTCTGATTTTGTGTAAGAGTTTGTATGCGTGTGTTCCTGTGTGTGT","TGAGTGTATATACGTAGCAAGCATGTGTGTATGGATGACTGTGTCTGTGTCTGAGTGTGTGGGTTTGGAGTGTGTGTGCATGTGTATGGCTGTGTGTGTGTTTTGAGTGTAAGCATGTATGTGCGTGAGCGTGTATATGTAAGTATGTG","ATATACACACTCACACACACATACACACATGCACACATACACGCACATA","TGTAAGGTGGAGAGAGAGCCGGCTAAGTGTGTAAGATGGAGAGAGAGCCGGCTAAGCGTGTAAGGACTGGAGAGAGAGCCGGCTAAGCGTGTAAGGTGGAGAGAGAGCCGGCTAAGTGTGTAAGATGGAGAGAGAGCTGGCTAAGCGTGTAAGATGGAGAGAAAGCCGGCTAAGCGTGTAAGGTGGAGAGAGAGCCGGCTAAGCGTGTAAGGTGGAGAGCGAGCCGGCCAAGCGTGTAAGGTGGAGAGCGAGCCGGCTAAGCGTGTAAGGTGGAGAGCGAGCCGGCTAAGCGTGTAAGGTGGAGAGCGAGCCGGCTAAGCGTGTAAGATGGAGAGAGAGCCGGCTAAGCGTGTAAGATGGAGAGAGAGCCGGCTAAGCGTGTAAGATGGAGAGAGAGCCGGCTAAGCGTGTAAGGTGGAGAGAGAGCCGGCTAAGCGTGTAAGGTGGAGAGAGAGCCGGCTAAGCGTGTAAGATGGAGAGAGAGCCGGCTAAGCGTGTAAGATGGAGAGAGAGCCGGCTAAGCGTGTAAGGTGGAGAGAGAGCTGGCTA","GTGTACACTTCACGTTGTACTGACTGGAACACCTCAGTGTACACTTCACGTTGTACTGACTGGAACACCTCAGTGTACACGTTGTACTGATTGGAACACCTCAGTGTACACTTCACGTTGTACTGATTGGAACACCTCAGTGTACACTTCACGTTGTACTGACTGGAACACCTCAGTGTACACTTCACGTTGTACTGACTGGAACACCTCAGTGTACACTTCACGTTGTACTGATTGGAACACCTCAGTGTACACTTCACGTTGTACTGACTGGAACACCTCAGTGTACACTTCACGTTGTACTGATTGGAACACCTCAGTGTACACTTCACGTTGTACTGATTGGAACACCTCAGTGTACACTTCACGTTGTACTGACTGGAACACCTCAGTGTACACTTCACGTTGTACTGACTGGAACACCTCAGTGTACACTTCACGTTGTACTG"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>seq_name<\/th>\n      <th>per_CG<\/th>\n      <th>per_CA<\/th>\n      <th>sequence<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="dmr-intersected-with-only-tayn-positive-and-wt-negative-peaks"
+class="section level2">
+<h2>DMR intersected with only TAYN positive and WT negative peaks</h2>
+<div class="figure" style="text-align: center">
+<img src="Images/Annotate/IgG/DMR_TAYN_with_dip/upper_level_tot.png" alt="DMRs intersected with Dip consensus peaks only" width="49%" /><img src="Images/Annotate/IgG/DMR_TAYN_with_dip/lower_level_tot.png" alt="DMRs intersected with Dip consensus peaks only" width="49%" />
+<p class="caption">
+DMRs intersected with Dip consensus peaks only
+</p>
+</div>
+</div>
+<div id="dmrs-intersected-only-with-dip-consensus-peaks"
+class="section level2">
+<h2>DMRS intersected only with Dip consensus peaks</h2>
+<p><img src="Images/Annotate/IgG/DMR_onlyDip/upper_level_tot.png" width="49%" /><img src="Images/Annotate/IgG/DMR_onlyDip/lower_level_tot.png" width="49%" /></p>
+</div>
+<div id="annotation-of-medipseq-peaks" class="section level2">
+<h2>Annotation of MeDipSeq peaks</h2>
+<p><img src="Images/Annotate/IgG/MeDip/upper_level_tot.png" width="49%" /><img src="Images/Annotate/IgG/MeDip/lower_level_tot.png" width="49%" /></p>
+</div>
+<div id="annotation-of-hmedipseq-peaks" class="section level2">
+<h2>Annotation of hMeDipSeq peaks</h2>
+<p><img src="Images/Annotate/IgG/hMeDip/upper_level_tot.png" width="49%" /><img src="Images/Annotate/IgG/hMeDip/lower_level_tot.png" width="49%" /></p>
+</div>
+<div id="annotation-of-consensus-dipseq-peaks" class="section level2">
+<h2>Annotation of Consensus DipSeq peaks</h2>
+<p><img src="Images/Annotate/IgG/DipConsensus/upper_level_tot.png" width="49%" /><img src="Images/Annotate/IgG/DipConsensus/lower_level_tot.png" width="49%" /></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
