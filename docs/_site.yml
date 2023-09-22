@@ -13,3 +13,5 @@ navbar:
       href: annotate.html
     - text: "IgG Peaks"
       href: IgG.html
+    - text: "MBD Consensus Peaks"
+      href: Only_MBD_DMRs.html
